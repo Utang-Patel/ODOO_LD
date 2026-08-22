@@ -11,7 +11,7 @@ import '../../providers/trip_provider.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/trip_card.dart';
 
-/// My Trips screen listing active, upcoming, and past adventures
+/// My Trips screen listing active, upcoming, and past adventures matching React MyTrips page
 class MyTripsScreen extends ConsumerStatefulWidget {
   const MyTripsScreen({super.key});
 
@@ -44,10 +44,10 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen> with SingleTicker
       title: 'My Journeys',
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/create-trip'),
-        backgroundColor: AppColors.oceanBlue,
+        backgroundColor: AppColors.primary,
         foregroundColor: AppColors.white,
         icon: const Icon(Icons.add_rounded),
-        label: const Text('Plan New Trip', style: TextStyle(fontWeight: FontWeight.w600)),
+        label: const Text('Plan New Trip', style: TextStyle(fontWeight: FontWeight.w700)),
       ),
       child: Column(
         children: [
@@ -55,25 +55,33 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen> with SingleTicker
             title: 'Your Travel Timeline',
             subtitle: 'Manage customized multi-city itineraries and budgets',
           ),
-          // Filter Tabs
+          // Filter Tabs (Glass Dark Theme)
           Container(
             margin: const EdgeInsets.symmetric(horizontal: AppConstants.paddingMedium),
+            padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: AppColors.borderGlass),
             ),
             child: TabBar(
               controller: _tabController,
               indicatorSize: TabBarIndicatorSize.tab,
               dividerColor: Colors.transparent,
               indicator: BoxDecoration(
-                color: AppColors.oceanBlue,
-                borderRadius: BorderRadius.circular(AppConstants.radiusMedium - 2),
+                gradient: AppColors.saasGradient,
+                borderRadius: BorderRadius.circular(AppConstants.radiusMedium - 4),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.35),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               labelColor: AppColors.white,
-              unselectedLabelColor: AppColors.textSecondary,
-              labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+              unselectedLabelColor: AppColors.textMuted,
+              labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
               tabs: const [
                 Tab(text: 'Upcoming'),
                 Tab(text: 'Completed'),

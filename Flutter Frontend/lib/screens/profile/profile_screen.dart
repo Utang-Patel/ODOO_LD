@@ -39,11 +39,15 @@ class ProfileScreen extends ConsumerWidget {
               ),
               child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: 44,
-                    backgroundColor: AppColors.aqua,
+                  Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: AppColors.saasGradient,
+                    ),
                     child: CircleAvatar(
-                      radius: 41,
+                      radius: 42,
+                      backgroundColor: AppColors.bgSecondary,
                       backgroundImage: user?.avatarUrl.isNotEmpty == true
                           ? CachedNetworkImageProvider(user!.avatarUrl)
                           : null,
@@ -52,13 +56,14 @@ class ProfileScreen extends ConsumerWidget {
                           : null,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   Text(
                     user?.name ?? 'Alex Morgan',
                     style: const TextStyle(
-                      fontSize: 20,
+                      fontSize: 22,
                       fontWeight: FontWeight.w800,
                       color: AppColors.white,
+                      letterSpacing: -0.4,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -66,23 +71,23 @@ class ProfileScreen extends ConsumerWidget {
                     user?.email ?? 'alex.morgan@wanderlust.io',
                     style: const TextStyle(
                       fontSize: 13,
-                      color: AppColors.borderLight,
+                      color: AppColors.textMuted,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
                     decoration: BoxDecoration(
-                      color: AppColors.aqua.withValues(alpha: 0.2),
+                      color: const Color(0x2606B6D4),
                       borderRadius: BorderRadius.circular(AppConstants.radiusFull),
-                      border: Border.all(color: AppColors.aqua.withValues(alpha: 0.5)),
+                      border: Border.all(color: const Color(0x5906B6D4)),
                     ),
                     child: const Text(
                       '⭐ Verified GlobeTrotter Explorer',
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.aqua,
+                        color: AppColors.supporting,
                       ),
                     ),
                   ),

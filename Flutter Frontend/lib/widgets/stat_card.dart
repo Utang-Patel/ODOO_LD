@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_constants.dart';
 
-/// Compact stat metric card for milestones, trips count, and travel score
+/// Compact stat metric card for milestones, trips count, and travel score with dark glass styling
 class StatCard extends StatelessWidget {
   final String title;
   final String value;
@@ -23,14 +23,21 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveColor = iconColor ?? AppColors.oceanBlue;
+    final effectiveColor = iconColor ?? AppColors.primary;
 
     return Container(
       padding: const EdgeInsets.all(AppConstants.paddingMedium),
       decoration: BoxDecoration(
-        color: backgroundColor ?? AppColors.white,
+        color: backgroundColor ?? AppColors.surface,
         borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.borderGlass),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.25),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,8 +49,9 @@ class StatCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: effectiveColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
+                  color: effectiveColor.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(AppConstants.radiusSmall + 2),
+                  border: Border.all(color: effectiveColor.withValues(alpha: 0.35)),
                 ),
                 child: Icon(icon, color: effectiveColor, size: 20),
               ),
@@ -52,7 +60,7 @@ class StatCard extends StatelessWidget {
                   subtitle!,
                   style: TextStyle(
                     fontSize: 11,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                     color: effectiveColor,
                   ),
                 ),
@@ -62,9 +70,10 @@ class StatCard extends StatelessWidget {
           Text(
             value,
             style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
               color: AppColors.textMain,
+              letterSpacing: -0.5,
             ),
           ),
           const SizedBox(height: 2),
@@ -73,7 +82,7 @@ class StatCard extends StatelessWidget {
             style: const TextStyle(
               fontSize: 12,
               color: AppColors.textMuted,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],

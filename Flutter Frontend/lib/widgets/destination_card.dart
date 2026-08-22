@@ -4,13 +4,14 @@ import '../core/constants/app_colors.dart';
 import '../core/constants/app_constants.dart';
 import '../models/city.dart';
 
-/// Premium destination card featuring destination imagery, rating, tag, and cost
+/// Premium destination card featuring destination imagery, rating, tag, and cost matching React DestinationCard
 class DestinationCard extends StatelessWidget {
   final City city;
   final VoidCallback? onTap;
   final double width;
   final double height;
   final bool showCost;
+  final bool isSaved;
 
   const DestinationCard({
     super.key,
@@ -19,6 +20,7 @@ class DestinationCard extends StatelessWidget {
     this.width = 220.0,
     this.height = 280.0,
     this.showCost = true,
+    this.isSaved = false,
   });
 
   @override
@@ -27,11 +29,13 @@ class DestinationCard extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
+        border: Border.all(color: AppColors.borderGlass),
         boxShadow: [
           BoxShadow(
-            color: AppColors.deepNavy.withValues(alpha: 0.08),
-            blurRadius: 16,
+            color: Colors.black.withValues(alpha: 0.35),
+            blurRadius: 18,
             offset: const Offset(0, 6),
           ),
         ],
@@ -43,15 +47,17 @@ class DestinationCard extends StatelessWidget {
           children: [
             // Background Destination Image
             CachedNetworkImage(
-              imageUrl: city.imageUrl,
+              imageUrl: city.imageUrl.isNotEmpty
+                  ? city.imageUrl
+                  : 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80',
               fit: BoxFit.cover,
               placeholder: (context, url) => Container(
-                color: AppColors.borderLight,
-                child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                color: AppColors.surfaceHover,
+                child: const Center(child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary)),
               ),
               errorWidget: (context, url, error) => Container(
-                color: AppColors.deepNavy,
-                child: const Icon(Icons.location_city, color: AppColors.white),
+                color: AppColors.bgSecondary,
+                child: const Icon(Icons.location_city, color: AppColors.primary),
               ),
             ),
             // Gradient Overlay
@@ -60,10 +66,10 @@ class DestinationCard extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: [
                     Colors.transparent,
-                    AppColors.deepNavy.withValues(alpha: 0.3),
-                    AppColors.deepNavy.withValues(alpha: 0.9),
+                    AppColors.bgPrimary.withValues(alpha: 0.4),
+                    AppColors.bgPrimary.withValues(alpha: 0.95),
                   ],
-                  stops: const [0.3, 0.6, 1.0],
+                  stops: const [0.3, 0.65, 1.0],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -80,35 +86,43 @@ class DestinationCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppColors.oceanBlue.withValues(alpha: 0.9),
+                      gradient: AppColors.saasGradient,
                       borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.35),
+                          blurRadius: 6,
+                        ),
+                      ],
                     ),
                     child: Text(
                       city.tag,
                       style: const TextStyle(
                         color: AppColors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.3,
                       ),
                     ),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppColors.white.withValues(alpha: 0.95),
+                      color: AppColors.bgSecondary.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                      border: Border.all(color: AppColors.borderGlass),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.star_rounded, color: AppColors.goldenYellow, size: 14),
-                        const SizedBox(width: 2),
+                        const Icon(Icons.star_rounded, color: Color(0xFFFBBF24), size: 14),
+                        const SizedBox(width: 3),
                         Text(
                           city.rating.toStringAsFixed(1),
                           style: const TextStyle(
                             fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textMain,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.white,
                           ),
                         ),
                       ],
@@ -130,21 +144,21 @@ class DestinationCard extends StatelessWidget {
                     city.name,
                     style: const TextStyle(
                       fontSize: 18,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w800,
                       color: AppColors.white,
-                      letterSpacing: -0.2,
+                      letterSpacing: -0.3,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 3),
                   Row(
                     children: [
-                      const Icon(Icons.location_on_rounded, size: 13, color: AppColors.aqua),
-                      const SizedBox(width: 3),
+                      const Icon(Icons.location_on_rounded, size: 13, color: AppColors.supporting),
+                      const SizedBox(width: 4),
                       Text(
                         city.country,
                         style: const TextStyle(
                           fontSize: 12,
-                          color: AppColors.borderLight,
+                          color: AppColors.textSecondary,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -152,12 +166,20 @@ class DestinationCard extends StatelessWidget {
                   ),
                   if (showCost) ...[
                     const SizedBox(height: 8),
-                    Text(
-                      'Avg \$${city.avgCostPerDay.toInt()} / day',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppColors.goldenYellow,
-                        fontWeight: FontWeight.w600,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0x2606B6D4),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: const Color(0x5906B6D4)),
+                      ),
+                      child: Text(
+                        'Avg \$${city.avgCostPerDay.toInt()} / day',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.supporting,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ],

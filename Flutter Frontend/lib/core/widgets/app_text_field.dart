@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_constants.dart';
 
-/// Styled input textfield for forms with icons, password toggle, and clear action
+/// Styled input textfield for forms with icons, password toggle, and dark glass styling
 class AppTextField extends StatefulWidget {
   final String? label;
   final String? hintText;
@@ -62,7 +62,7 @@ class _AppTextFieldState extends State<AppTextField> {
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: AppColors.textMain,
+              color: AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 6),
@@ -85,11 +85,17 @@ class _AppTextFieldState extends State<AppTextField> {
           ),
           decoration: InputDecoration(
             hintText: widget.hintText,
+            hintStyle: const TextStyle(
+              color: AppColors.textMuted,
+              fontSize: 14,
+            ),
+            filled: true,
+            fillColor: AppColors.surface,
             prefixIcon: widget.prefixIcon != null
                 ? Icon(
                     widget.prefixIcon,
-                    size: 20,
-                    color: AppColors.textMuted,
+                    size: 19,
+                    color: AppColors.primary,
                   )
                 : null,
             suffixIcon: widget.isPassword
@@ -108,8 +114,16 @@ class _AppTextFieldState extends State<AppTextField> {
                 : widget.suffix,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderRadius: BorderRadius.circular(AppConstants.radiusSmall + 4),
+              borderSide: const BorderSide(color: AppColors.borderGlass),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppConstants.radiusSmall + 4),
+              borderSide: const BorderSide(color: AppColors.borderGlass),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppConstants.radiusSmall + 4),
+              borderSide: const BorderSide(color: AppColors.primary, width: 1.8),
             ),
           ),
         ),

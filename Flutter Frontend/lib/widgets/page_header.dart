@@ -27,7 +27,7 @@ class PageHeader extends StatelessWidget {
         vertical: AppConstants.paddingSmall,
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
             child: Column(
@@ -38,16 +38,17 @@ class PageHeader extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: (tagColor ?? AppColors.oceanBlue).withValues(alpha: 0.12),
+                      color: (tagColor ?? AppColors.primary).withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                      border: Border.all(color: (tagColor ?? AppColors.primary).withValues(alpha: 0.35)),
                     ),
                     child: Text(
                       tag!.toUpperCase(),
                       style: TextStyle(
                         fontSize: 10,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w800,
                         letterSpacing: 0.8,
-                        color: tagColor ?? AppColors.oceanBlue,
+                        color: tagColor ?? AppColors.secondary,
                       ),
                     ),
                   ),
@@ -56,27 +57,28 @@ class PageHeader extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
                     color: AppColors.textMain,
                     letterSpacing: -0.3,
                   ),
                 ),
                 if (subtitle != null) ...[
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 3),
                   Text(
                     subtitle!,
                     style: const TextStyle(
                       fontSize: 13,
-                      color: AppColors.textSecondary,
+                      color: AppColors.textMuted,
                       height: 1.3,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ],
             ),
           ),
-          ?trailing,
+          if (trailing != null) trailing!,
         ],
       ),
     );

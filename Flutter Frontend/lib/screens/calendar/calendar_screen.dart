@@ -82,26 +82,32 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     });
                   },
                   calendarStyle: CalendarStyle(
+                    defaultTextStyle: const TextStyle(color: AppColors.textMain, fontWeight: FontWeight.w600),
+                    weekendTextStyle: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+                    outsideTextStyle: const TextStyle(color: AppColors.textMuted),
                     todayDecoration: BoxDecoration(
-                      color: AppColors.aqua.withValues(alpha: 0.5),
+                      color: AppColors.primary.withValues(alpha: 0.35),
                       shape: BoxShape.circle,
+                      border: Border.all(color: AppColors.primary),
                     ),
                     selectedDecoration: const BoxDecoration(
-                      color: AppColors.oceanBlue,
+                      color: AppColors.primary,
                       shape: BoxShape.circle,
                     ),
-                    selectedTextStyle: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+                    selectedTextStyle: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w800),
                     markerDecoration: const BoxDecoration(
-                      color: AppColors.sunsetOrange,
+                      color: AppColors.secondary,
                       shape: BoxShape.circle,
                     ),
                   ),
                   headerStyle: const HeaderStyle(
                     formatButtonVisible: false,
                     titleCentered: true,
+                    leftChevronIcon: Icon(Icons.chevron_left, color: AppColors.textMain),
+                    rightChevronIcon: Icon(Icons.chevron_right, color: AppColors.textMain),
                     titleTextStyle: TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w800,
                       color: AppColors.textMain,
                     ),
                   ),

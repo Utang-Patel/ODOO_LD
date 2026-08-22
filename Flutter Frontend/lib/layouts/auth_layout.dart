@@ -5,7 +5,7 @@ import '../core/constants/app_constants.dart';
 import '../core/constants/app_strings.dart';
 import '../core/utils/responsive.dart';
 
-/// Responsive authentication scaffold supporting gradient branding & adaptive form container
+/// Responsive authentication scaffold supporting cyber gradient branding & dark glassmorphic form container
 class AuthLayout extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -25,39 +25,50 @@ class AuthLayout extends StatelessWidget {
     final isTablet = Responsive.isTablet(context) || Responsive.isDesktop(context);
 
     return Scaffold(
-      backgroundColor: AppColors.deepNavy,
+      backgroundColor: AppColors.bgPrimary,
       body: Stack(
         children: [
-          // Aurora Gradient Background
+          // Deep Space Background
           Container(
-            decoration: const BoxDecoration(
-              gradient: AppColors.auroraGradient,
-            ),
+            color: AppColors.bgPrimary,
           ),
 
-          // Decorative Flight Path Curved Vectors & Glow
+          // Ambient Glowing Gradient Blobs
           Positioned(
-            top: -60,
-            right: -60,
+            top: -100,
+            right: -80,
             child: Container(
-              width: 240,
-              height: 240,
+              width: 320,
+              height: 320,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.aqua.withValues(alpha: 0.15),
+                color: AppColors.primary.withValues(alpha: 0.22),
               ),
-            ),
+            ).animate().scale(delay: const Duration(milliseconds: 200), duration: const Duration(milliseconds: 800)),
           ),
 
           Positioned(
-            bottom: -40,
-            left: -40,
+            bottom: -80,
+            left: -60,
             child: Container(
-              width: 200,
-              height: 200,
+              width: 280,
+              height: 280,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.sunsetOrange.withValues(alpha: 0.12),
+                color: AppColors.secondary.withValues(alpha: 0.18),
+              ),
+            ).animate().scale(delay: const Duration(milliseconds: 400), duration: const Duration(milliseconds: 800)),
+          ),
+
+          Positioned(
+            top: 200,
+            left: -100,
+            child: Container(
+              width: 250,
+              height: 250,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.supporting.withValues(alpha: 0.12),
               ),
             ),
           ),
@@ -112,7 +123,7 @@ class AuthLayout extends StatelessWidget {
                   const Text(
                     'Create customized multi-city itineraries, discover hidden gems, visualize flights, and manage travel budgets effortlessly.',
                     style: TextStyle(
-                      color: AppColors.cloud,
+                      color: AppColors.textSecondary,
                       fontSize: 15,
                       height: 1.5,
                     ),
@@ -144,17 +155,17 @@ class AuthLayout extends StatelessWidget {
       crossAxisAlignment: isLeftAligned ? CrossAxisAlignment.start : CrossAxisAlignment.center,
       children: [
         Container(
-          width: 80,
-          height: 80,
-          padding: const EdgeInsets.all(10),
+          width: 72,
+          height: 72,
+          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: Colors.white,
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: AppColors.aqua.withValues(alpha: 0.35),
-                blurRadius: 16,
-                offset: const Offset(0, 4),
+                color: AppColors.primary.withValues(alpha: 0.5),
+                blurRadius: 24,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
@@ -162,24 +173,40 @@ class AuthLayout extends StatelessWidget {
             'assets/images/logo.png',
             fit: BoxFit.contain,
           ),
-        ).animate().scale(duration: const Duration(milliseconds: 500)),
-        const SizedBox(height: 12),
-        const Text(
-          AppStrings.appName,
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.w800,
-            color: AppColors.white,
-            letterSpacing: -0.5,
+        ).animate().scale(duration: const Duration(milliseconds: 500), curve: Curves.elasticOut),
+        const SizedBox(height: 14),
+        RichText(
+          text: const TextSpan(
+            children: [
+              TextSpan(
+                text: 'Globe',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.white,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              TextSpan(
+                text: 'Trotter',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.secondary,
+                  letterSpacing: -0.5,
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 4),
         const Text(
           AppStrings.appTagline,
           style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: AppColors.aqua,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppColors.supporting,
+            letterSpacing: 0.2,
           ),
         ),
       ],
@@ -191,13 +218,14 @@ class AuthLayout extends StatelessWidget {
       constraints: const BoxConstraints(maxWidth: 440),
       padding: const EdgeInsets.all(AppConstants.paddingLarge),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.surface.withValues(alpha: 0.85),
         borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
+        border: Border.all(color: AppColors.borderGlass, width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: AppColors.deepNavy.withValues(alpha: 0.25),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
+            color: Colors.black.withValues(alpha: 0.5),
+            blurRadius: 36,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -208,9 +236,9 @@ class AuthLayout extends StatelessWidget {
             title,
             style: const TextStyle(
               fontSize: 22,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w800,
               color: AppColors.textMain,
-              letterSpacing: -0.3,
+              letterSpacing: -0.4,
             ),
           ),
           const SizedBox(height: 6),

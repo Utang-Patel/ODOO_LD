@@ -6,7 +6,7 @@ import '../core/constants/app_strings.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/app_drawer.dart';
 
-/// Main Dashboard Scaffold with unified AppBar, Mobile Bottom Navigation, and Drawer
+/// Main Dashboard Scaffold with unified Dark Cyber Glass AppBar, Navigation, and Drawer
 class DashboardLayout extends ConsumerWidget {
   final Widget child;
   final int currentIndex;
@@ -31,14 +31,15 @@ class DashboardLayout extends ConsumerWidget {
     final user = authState.user;
 
     return Scaffold(
-      backgroundColor: AppColors.cloud,
+      backgroundColor: AppColors.bgPrimary,
       drawer: showBackButton ? null : const AppDrawer(),
       appBar: AppBar(
-        backgroundColor: AppColors.white,
+        backgroundColor: AppColors.bgPrimary,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: showBackButton
             ? IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: AppColors.textMain),
+                icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 19, color: AppColors.textMain),
                 onPressed: () {
                   if (context.canPop()) {
                     context.pop();
@@ -58,26 +59,56 @@ class DashboardLayout extends ConsumerWidget {
                 title!,
                 style: const TextStyle(
                   fontSize: 18,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
                   color: AppColors.textMain,
+                  letterSpacing: -0.3,
                 ),
               )
             : Row(
                 children: [
-                  Image.asset(
-                    'assets/images/logo.png',
+                  Container(
                     width: 32,
                     height: 32,
-                    fit: BoxFit.contain,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.4),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(3),
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      fit: BoxFit.contain,
+                    ),
                   ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    AppStrings.appName,
-                    style: TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textMain,
-                      letterSpacing: -0.3,
+                  const SizedBox(width: 10),
+                  RichText(
+                    text: const TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'Globe',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 19,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        TextSpan(
+                          text: 'Trotter',
+                          style: TextStyle(
+                            color: AppColors.secondary,
+                            fontSize: 19,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -85,29 +116,37 @@ class DashboardLayout extends ConsumerWidget {
         actions: actions ??
             [
               IconButton(
-                icon: const Icon(Icons.notifications_none_rounded, color: AppColors.textMain),
+                icon: const Icon(Icons.notifications_none_rounded, color: AppColors.textSecondary, size: 22),
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('No new notifications. Safe travels! ✈️'),
+                      backgroundColor: AppColors.surface,
                       duration: Duration(seconds: 2),
                     ),
                   );
                 },
               ),
               Padding(
-                padding: const EdgeInsets.only(right: 12.0),
+                padding: const EdgeInsets.only(right: 14.0),
                 child: GestureDetector(
                   onTap: () => context.go('/profile'),
-                  child: CircleAvatar(
-                    radius: 16,
-                    backgroundColor: AppColors.oceanBlue,
-                    child: Text(
-                      user?.name.isNotEmpty == true ? user!.name[0].toUpperCase() : 'A',
-                      style: const TextStyle(
-                        color: AppColors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: AppColors.saasGradient,
+                    ),
+                    child: CircleAvatar(
+                      radius: 15,
+                      backgroundColor: AppColors.bgSecondary,
+                      child: Text(
+                        user?.name.isNotEmpty == true ? user!.name[0].toUpperCase() : 'A',
+                        style: const TextStyle(
+                          color: AppColors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                   ),

@@ -3,7 +3,7 @@ import '../core/constants/app_colors.dart';
 import '../core/constants/app_constants.dart';
 import '../models/trip_stop.dart';
 
-/// Interactive visual travel route connecting multi-city stops with flight vectors
+/// Interactive visual travel route connecting multi-city stops with flight vectors matching React Timeline & Route
 class RoutePreview extends StatelessWidget {
   final List<TripStop> stops;
   final VoidCallback? onTap;
@@ -24,9 +24,16 @@ class RoutePreview extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppConstants.paddingMedium),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.borderGlass),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,13 +43,13 @@ class RoutePreview extends StatelessWidget {
             children: [
               const Row(
                 children: [
-                  Icon(Icons.alt_route_rounded, size: 18, color: AppColors.oceanBlue),
+                  Icon(Icons.alt_route_rounded, size: 18, color: AppColors.secondary),
                   SizedBox(width: 8),
                   Text(
                     'Multi-City Route Preview',
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w800,
                       color: AppColors.textMain,
                     ),
                   ),
@@ -51,15 +58,16 @@ class RoutePreview extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.oceanBlue.withValues(alpha: 0.1),
+                  color: const Color(0x26EC4899),
                   borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                  border: Border.all(color: const Color(0x59EC4899)),
                 ),
                 child: Text(
                   '${stops.length} Stops',
                   style: const TextStyle(
                     fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.oceanBlue,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.secondary,
                   ),
                 ),
               ),
@@ -70,11 +78,11 @@ class RoutePreview extends StatelessWidget {
           LayoutBuilder(
             builder: (context, constraints) {
               return SizedBox(
-                height: 80,
+                height: 85,
                 child: Stack(
                   alignment: Alignment.centerLeft,
                   children: [
-                    // Connecting Route Line
+                    // Connecting Route Line in SaaS Gradient
                     Positioned(
                       left: 20,
                       right: 20,
@@ -82,12 +90,12 @@ class RoutePreview extends StatelessWidget {
                       child: Container(
                         height: 3,
                         decoration: BoxDecoration(
-                          gradient: AppColors.primaryGradient,
+                          gradient: AppColors.saasGradient,
                           borderRadius: BorderRadius.circular(2),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.oceanBlue.withValues(alpha: 0.3),
-                              blurRadius: 6,
+                              color: AppColors.primary.withValues(alpha: 0.5),
+                              blurRadius: 8,
                               spreadRadius: 1,
                             ),
                           ],
@@ -110,15 +118,16 @@ class RoutePreview extends StatelessWidget {
                               height: 36,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: isFirst || isLast ? AppColors.oceanBlue : AppColors.white,
+                                gradient: isFirst || isLast ? AppColors.saasGradient : null,
+                                color: isFirst || isLast ? null : AppColors.surfaceHover,
                                 border: Border.all(
-                                  color: AppColors.oceanBlue,
-                                  width: 2.5,
+                                  color: isFirst || isLast ? Colors.transparent : AppColors.primary,
+                                  width: 2,
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppColors.oceanBlue.withValues(alpha: 0.2),
-                                    blurRadius: 8,
+                                    color: AppColors.primary.withValues(alpha: 0.4),
+                                    blurRadius: 10,
                                     offset: const Offset(0, 2),
                                   ),
                                 ],
@@ -132,8 +141,8 @@ class RoutePreview extends StatelessWidget {
                                             '${index + 1}',
                                             style: const TextStyle(
                                               fontSize: 12,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppColors.oceanBlue,
+                                              fontWeight: FontWeight.w800,
+                                              color: AppColors.supporting,
                                             ),
                                           ),
                               ),

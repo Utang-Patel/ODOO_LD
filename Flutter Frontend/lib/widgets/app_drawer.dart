@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../core/constants/app_colors.dart';
 import '../providers/auth_provider.dart';
 
-/// Dark Theme Side Navigation Drawer matching the custom design
+/// Dark Theme Side Navigation Drawer matching the React frontend styling
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
@@ -16,7 +16,7 @@ class AppDrawer extends ConsumerWidget {
     } catch (_) {}
 
     return Drawer(
-      backgroundColor: const Color(0xFF071724), // Dark Navy Background
+      backgroundColor: AppColors.bgSecondary,
       child: SafeArea(
         child: Column(
           children: [
@@ -33,18 +33,16 @@ class AppDrawer extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.25),
-                          blurRadius: 8,
+                          color: AppColors.primary.withValues(alpha: 0.35),
+                          blurRadius: 10,
                           offset: const Offset(0, 2),
                         ),
                       ],
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        fit: BoxFit.contain,
-                      ),
+                    padding: const EdgeInsets.all(4),
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      fit: BoxFit.contain,
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -63,7 +61,7 @@ class AppDrawer extends ConsumerWidget {
                         TextSpan(
                           text: 'Trotter',
                           style: TextStyle(
-                            color: Color(0xFF00E5D9),
+                            color: AppColors.secondary,
                             fontSize: 22,
                             fontWeight: FontWeight.w800,
                             letterSpacing: -0.5,
@@ -75,13 +73,13 @@ class AppDrawer extends ConsumerWidget {
                 ],
               ),
             ),
-            const Divider(color: Color(0xFF1E3A52), height: 1, indent: 20, endIndent: 20),
+            const Divider(color: Color(0x26CBD5E1), height: 1, indent: 20, endIndent: 20),
             const SizedBox(height: 12),
 
             // Main Menu List
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 14),
                 children: [
                   _buildDrawerTile(
                     context: context,
@@ -150,8 +148,6 @@ class AppDrawer extends ConsumerWidget {
               ),
             ),
 
-
-
             // Log Out Button
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
@@ -168,10 +164,10 @@ class AppDrawer extends ConsumerWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(
-                    color: Colors.transparent,
+                    color: const Color(0x1AF43F5E),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: const Color(0xFFEF4444).withValues(alpha: 0.5),
+                      color: const Color(0xFFF43F5E).withValues(alpha: 0.4),
                       width: 1.2,
                     ),
                   ),
@@ -180,16 +176,16 @@ class AppDrawer extends ConsumerWidget {
                     children: [
                       Icon(
                         Icons.logout_rounded,
-                        color: Color(0xFFEF4444),
+                        color: Color(0xFFF43F5E),
                         size: 20,
                       ),
                       SizedBox(width: 10),
                       Text(
                         'Log Out',
                         style: TextStyle(
-                          color: Color(0xFFEF4444),
+                          color: Color(0xFFF43F5E),
                           fontSize: 15,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
@@ -229,22 +225,32 @@ class AppDrawer extends ConsumerWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF00D5CF) : Colors.transparent,
+              gradient: isSelected ? AppColors.saasGradient : null,
+              color: isSelected ? null : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.4),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ]
+                  : null,
             ),
             child: Row(
               children: [
                 Icon(
                   icon,
-                  color: isSelected ? Colors.white : const Color(0xFF94A3B8),
+                  color: isSelected ? Colors.white : AppColors.textMuted,
                   size: 22,
                 ),
                 const SizedBox(width: 16),
                 Text(
                   title,
                   style: TextStyle(
-                    color: isSelected ? Colors.white : const Color(0xFFCBD5E1),
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    color: isSelected ? Colors.white : AppColors.textSecondary,
+                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                     fontSize: 15,
                   ),
                 ),

@@ -11,7 +11,7 @@ enum AppButtonVariant {
   text,
 }
 
-/// Custom responsive button supporting gradients, loading states, and icon badges
+/// Custom responsive button supporting SaaS gradients, glowing shadows, loading states, and icon badges
 class AppButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
@@ -30,33 +30,30 @@ class AppButton extends StatelessWidget {
     this.isLoading = false,
     this.icon,
     this.width,
-    this.height = 50.0,
+    this.height = 48.0,
     this.padding,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (variant == AppButtonVariant.gradient || variant == AppButtonVariant.sunset) {
-      final gradient = variant == AppButtonVariant.gradient
-          ? AppColors.primaryGradient
-          : AppColors.sunsetGradient;
+    if (variant == AppButtonVariant.gradient || variant == AppButtonVariant.primary || variant == AppButtonVariant.sunset) {
+      final gradient = variant == AppButtonVariant.sunset
+          ? AppColors.sunsetGradient
+          : AppColors.saasGradient;
 
       return Container(
         width: width ?? double.infinity,
         height: height,
         decoration: BoxDecoration(
           gradient: onPressed == null ? null : gradient,
-          color: onPressed == null ? AppColors.border : null,
-          borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+          color: onPressed == null ? AppColors.surfaceHover : null,
+          borderRadius: BorderRadius.circular(AppConstants.radiusSmall + 4),
           boxShadow: onPressed == null
               ? null
               : [
                   BoxShadow(
-                    color: (variant == AppButtonVariant.gradient
-                            ? AppColors.oceanBlue
-                            : AppColors.sunsetOrange)
-                        .withValues(alpha: 0.25),
-                    blurRadius: 12,
+                    color: AppColors.primary.withValues(alpha: 0.4),
+                    blurRadius: 16,
                     offset: const Offset(0, 4),
                   ),
                 ],
@@ -64,7 +61,7 @@ class AppButton extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+            borderRadius: BorderRadius.circular(AppConstants.radiusSmall + 4),
             onTap: isLoading ? null : onPressed,
             child: Center(
               child: _buildContent(context, AppColors.white),
@@ -75,18 +72,23 @@ class AppButton extends StatelessWidget {
     }
 
     if (variant == AppButtonVariant.outline) {
-      return SizedBox(
+      return Container(
         width: width ?? double.infinity,
         height: height,
-        child: OutlinedButton(
-          onPressed: isLoading ? null : onPressed,
-          style: OutlinedButton.styleFrom(
-            padding: padding ?? const EdgeInsets.symmetric(horizontal: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+        decoration: BoxDecoration(
+          color: const Color(0x1A7C3AED),
+          borderRadius: BorderRadius.circular(AppConstants.radiusSmall + 4),
+          border: Border.all(color: const Color(0x597C3AED), width: 1.2),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(AppConstants.radiusSmall + 4),
+            onTap: isLoading ? null : onPressed,
+            child: Center(
+              child: _buildContent(context, AppColors.white),
             ),
           ),
-          child: _buildContent(context, AppColors.oceanBlue),
         ),
       );
     }
@@ -97,35 +99,28 @@ class AppButton extends StatelessWidget {
         style: TextButton.styleFrom(
           padding: padding ?? const EdgeInsets.symmetric(horizontal: 16),
         ),
-        child: _buildContent(context, AppColors.oceanBlue),
+        child: _buildContent(context, AppColors.supporting),
       );
     }
 
-    // Default primary or secondary
-    final bgColor = variant == AppButtonVariant.secondary
-        ? AppColors.cloud
-        : AppColors.oceanBlue;
-    final fgColor = variant == AppButtonVariant.secondary
-        ? AppColors.textMain
-        : AppColors.white;
-
-    return SizedBox(
+    // Default secondary (Dark Glass)
+    return Container(
       width: width ?? double.infinity,
       height: height,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: bgColor,
-          foregroundColor: fgColor,
-          padding: padding ?? const EdgeInsets.symmetric(horizontal: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-            side: variant == AppButtonVariant.secondary
-                ? const BorderSide(color: AppColors.border)
-                : BorderSide.none,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppConstants.radiusSmall + 4),
+        border: Border.all(color: AppColors.borderGlass),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppConstants.radiusSmall + 4),
+          onTap: isLoading ? null : onPressed,
+          child: Center(
+            child: _buildContent(context, AppColors.textMain),
           ),
         ),
-        child: _buildContent(context, fgColor),
       ),
     );
   }
@@ -133,10 +128,10 @@ class AppButton extends StatelessWidget {
   Widget _buildContent(BuildContext context, Color textColor) {
     if (isLoading) {
       return SizedBox(
-        height: 22,
-        width: 22,
+        height: 20,
+        width: 20,
         child: CircularProgressIndicator(
-          strokeWidth: 2.5,
+          strokeWidth: 2.2,
           valueColor: AlwaysStoppedAnimation<Color>(textColor),
         ),
       );
@@ -154,8 +149,9 @@ class AppButton extends StatelessWidget {
               text,
               style: TextStyle(
                 color: textColor,
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.2,
               ),
               overflow: TextOverflow.ellipsis,
             ),
@@ -168,8 +164,9 @@ class AppButton extends StatelessWidget {
       text,
       style: TextStyle(
         color: textColor,
-        fontSize: 15,
-        fontWeight: FontWeight.w600,
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0.2,
       ),
       overflow: TextOverflow.ellipsis,
     );
