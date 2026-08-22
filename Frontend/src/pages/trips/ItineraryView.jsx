@@ -56,9 +56,9 @@ const ItineraryView = () => {
 
   if (error || !trip) {
     return (
-      <div className="gt-card p-5 text-center my-4">
-        <h5 className="font-heading text-navy-deep fw-bold mb-2">{error || "Trip not found"}</h5>
-        <Link to="/my-trips" className="btn btn-gt-primary px-4">Back to My Trips</Link>
+      <div className="gt-glass-card p-5 text-center my-4">
+        <h5 className="font-heading text-white fw-bold mb-2">{error || "Trip not found"}</h5>
+        <Link to="/my-trips" className="btn btn-gt-primary px-4 font-heading">Back to My Trips</Link>
       </div>
     );
   }
@@ -75,7 +75,7 @@ const ItineraryView = () => {
         breadcrumbs={[{ label: "My Trips", path: "/my-trips" }, { label: "Itinerary Preview" }]}
         action={
           <div className="d-flex gap-2">
-            <Link to={`/itinerary/${trip.id}`} className="btn btn-gt-primary btn-sm fw-bold">
+            <Link to={`/itinerary/${trip.id}`} className="btn btn-gt-primary btn-sm fw-bold font-heading">
               <i className="bi bi-pencil-square me-1"></i> Edit Itinerary
             </Link>
           </div>
@@ -84,40 +84,40 @@ const ItineraryView = () => {
 
       {/* Hero Banner Card */}
       <div
-        className="gt-card p-4 p-md-5 text-white mb-4 rounded-4 position-relative overflow-hidden shadow-lg border-0"
+        className="gt-glass-card p-4 p-md-5 text-white mb-4 rounded-4 position-relative overflow-hidden shadow-lg border-0"
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(7,26,43,0.92), rgba(7,26,43,0.55)), url(${trip.cover_image || trip.coverImage})`,
+          backgroundImage: `linear-gradient(to right, rgba(7,11,26,0.92), rgba(7,11,26,0.6)), url(${trip.cover_image || trip.coverImage})`,
           backgroundSize: "cover",
           backgroundPosition: "center"
         }}
       >
         <div className="position-relative z-1">
-          <span className="badge bg-ocean-gradient text-white fw-bold px-3 py-2 rounded-pill mb-3">
+          <span className="badge bg-saas-gradient text-white fw-bold px-3 py-2 rounded-pill mb-3 font-heading">
             {status}
           </span>
 
           <h1 className="font-heading display-5 fw-extrabold text-white mb-2">{trip.trip_name || trip.name}</h1>
 
-          <p className="text-white-50 lead fs-6 max-w-2xl mb-4">
+          <p className="text-white-50 lead fs-6 max-w-2xl mb-4 font-heading">
             {trip.description || "No description provided for this trip."}
           </p>
 
-          <div className="d-flex flex-wrap align-items-center gap-4 pt-3 border-top border-white border-opacity-25">
-            <div className="d-flex align-items-center gap-2 text-aqua fw-semibold">
+          <div className="d-flex flex-wrap align-items-center gap-4 pt-3 border-top border-white border-opacity-20">
+            <div className="d-flex align-items-center gap-2 text-saas-gradient fw-semibold font-heading">
               <i className="bi bi-calendar-event fs-5"></i>
-              <span>{dateFormatted}</span>
+              <span className="text-white">{dateFormatted}</span>
             </div>
-            <div className="d-flex align-items-center gap-2 text-aqua fw-semibold">
+            <div className="d-flex align-items-center gap-2 text-saas-gradient fw-semibold font-heading">
               <i className="bi bi-clock-history fs-5"></i>
-              <span>{totalDays} {totalDays === 1 ? "Day" : "Days"}</span>
+              <span className="text-white">{totalDays} {totalDays === 1 ? "Day" : "Days"}</span>
             </div>
-            <div className="d-flex align-items-center gap-2 text-aqua fw-semibold">
+            <div className="d-flex align-items-center gap-2 text-saas-gradient fw-semibold font-heading">
               <i className="bi bi-geo-alt fs-5"></i>
-              <span>{stops.length} {stops.length === 1 ? "City Stop" : "City Stops"}</span>
+              <span className="text-white">{stops.length} {stops.length === 1 ? "City Stop" : "City Stops"}</span>
             </div>
-            <div className="d-flex align-items-center gap-2 text-aqua fw-semibold">
+            <div className="d-flex align-items-center gap-2 text-saas-gradient fw-semibold font-heading">
               <i className="bi bi-ticket-perforated fs-5"></i>
-              <span>{itineraryItems.length} {itineraryItems.length === 1 ? "Activity" : "Activities"}</span>
+              <span className="text-white">{itineraryItems.length} {itineraryItems.length === 1 ? "Activity" : "Activities"}</span>
             </div>
           </div>
         </div>
@@ -132,16 +132,16 @@ const ItineraryView = () => {
             const stopItems = itineraryItems.filter((i) => String(i.trip_stop_id) === String(stop.id));
 
             return (
-              <div key={stop.id} className="gt-card p-4 p-md-5">
-                <div className="d-flex align-items-center gap-3 pb-3 mb-3 border-bottom">
-                  <span className="badge bg-navy-deep text-aqua fs-6 p-2 rounded-3 fw-bold">
+              <div key={stop.id} className="gt-glass-card p-4 p-md-5">
+                <div className="d-flex align-items-center gap-3 pb-3 mb-3 border-bottom border-white border-opacity-10">
+                  <span className="badge bg-saas-gradient text-white fs-6 p-2 rounded-3 fw-bold font-heading">
                     STOP {idx + 1}
                   </span>
                   <div>
-                    <h4 className="font-heading fw-extrabold text-navy-deep mb-0">
+                    <h4 className="font-heading fw-extrabold text-white mb-0">
                       {cityName}, {countryName}
                     </h4>
-                    <span className="text-muted small">
+                    <span className="text-white-50 small font-heading">
                       {formatDateRange(stop.arrival_date, stop.departure_date)}
                     </span>
                   </div>
@@ -150,25 +150,25 @@ const ItineraryView = () => {
                 <div className="d-flex flex-column gap-2">
                   {stopItems.length > 0 ? (
                     stopItems.map((item) => (
-                      <div key={item.id} className="p-3 bg-light rounded-3 d-flex align-items-center justify-content-between">
+                      <div key={item.id} className="p-3 bg-dark bg-opacity-60 rounded-3 border border-white border-opacity-10 d-flex align-items-center justify-content-between">
                         <div className="d-flex align-items-center gap-3">
-                          <span className="badge bg-white text-navy-deep border fw-bold px-2 py-1">
+                          <span className="badge bg-dark text-white border border-white border-opacity-20 fw-bold px-2.5 py-1.5 font-heading">
                             {item.start_time} – {item.end_time}
                           </span>
                           <div>
-                            <h6 className="mb-0 font-heading fw-semibold text-navy-deep">
+                            <h6 className="mb-0 font-heading fw-semibold text-white">
                               {item.activity?.activity_name || item.activity?.name}
                             </h6>
-                            <span className="text-muted fs-7">{item.activity?.category}</span>
+                            <span className="text-white-50 fs-7 font-heading">{item.activity?.category}</span>
                           </div>
                         </div>
-                        <span className="fw-bold text-ocean-blue">
+                        <span className="fw-bold text-saas-gradient font-heading">
                           {parseFloat(item.activity?.cost || 0) > 0 ? `€${item.activity?.cost}` : "Free"}
                         </span>
                       </div>
                     ))
                   ) : (
-                    <p className="text-muted small mb-0 py-2">No activities scheduled yet for this city stop.</p>
+                    <p className="text-white-50 small mb-0 py-2 font-heading">No activities scheduled yet for this city stop.</p>
                   )}
                 </div>
               </div>
@@ -176,10 +176,10 @@ const ItineraryView = () => {
           })}
         </div>
       ) : (
-        <div className="gt-card p-5 text-center">
-          <p className="text-muted mb-3">No city stops have been added to this itinerary yet.</p>
-          <Link to={`/itinerary/${trip.id}`} className="btn btn-gt-primary px-4">
-            + Add City Stop in Itinerary Builder
+        <div className="gt-glass-card p-5 text-center">
+          <p className="text-white-50 mb-3 font-heading">No city stops have been added to this itinerary yet.</p>
+          <Link to={`/itinerary/${trip.id}`} className="btn btn-gt-primary px-4 font-heading fw-bold">
+            Add City Stop in Itinerary Builder
           </Link>
         </div>
       )}

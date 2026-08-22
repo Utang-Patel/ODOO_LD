@@ -14,14 +14,14 @@ const BudgetChart = ({ totals, currency = "INR" }) => {
       {
         data: [transport, accommodation, activities, meals],
         backgroundColor: [
-          "#0EA5E9", // Transport - Ocean Blue
-          "#06D6C9", // Accommodation - Aqua
-          "#FF8A3D", // Activities - Sunset Orange
-          "#FFD166"  // Meals - Golden Yellow
+          "#7C3AED", // Transport - Purple
+          "#EC4899", // Accommodation - Pink
+          "#F97316", // Activities - Orange
+          "#06B6D4"  // Meals - Cyan
         ],
-        borderWidth: 2,
-        borderColor: "#FFFFFF",
-        hoverOffset: 6
+        borderWidth: 3,
+        borderColor: "#070B1A",
+        hoverOffset: 8
       }
     ]
   };
@@ -31,17 +31,7 @@ const BudgetChart = ({ totals, currency = "INR" }) => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: "bottom",
-        labels: {
-          usePointStyle: true,
-          padding: 20,
-          font: {
-            family: "'Plus Jakarta Sans', sans-serif",
-            size: 12,
-            weight: "600"
-          },
-          color: "#071A2B"
-        }
+        display: false
       },
       tooltip: {
         callbacks: {
@@ -57,8 +47,8 @@ const BudgetChart = ({ totals, currency = "INR" }) => {
   };
 
   return (
-    <div className="position-relative d-flex flex-column align-items-center justify-content-center h-100 py-2">
-      <div style={{ height: "240px", width: "100%", maxWidth: "320px" }}>
+    <div className="position-relative d-flex flex-column align-items-center justify-content-center h-100 py-3">
+      <div style={{ height: "250px", width: "100%", maxWidth: "280px" }}>
         <Doughnut data={data} options={options} />
       </div>
     </div>

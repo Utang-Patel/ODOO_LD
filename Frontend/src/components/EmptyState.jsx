@@ -3,26 +3,26 @@ import { Link } from "react-router-dom";
 
 const EmptyState = ({ title = "No trips found ✈️", description = "Start planning your next adventure today.", actionLabel, actionPath, onAction }) => {
   return (
-    <div className="gt-card p-5 text-center my-4">
+    <div className="gt-glass-card p-5 text-center my-4 border-0">
       <div
-        className="d-inline-flex align-items-center justify-content-center bg-light text-ocean-blue rounded-circle mb-3 p-4"
-        style={{ width: "90px", height: "90px" }}
+        className="d-inline-flex align-items-center justify-content-center bg-dark text-saas-gradient rounded-circle mb-3 p-4 border border-white border-opacity-10"
+        style={{ width: "84px", height: "84px" }}
       >
-        <i className="bi bi-airplane-engines fs-1"></i>
+        <i className="bi bi-airplane fs-1"></i>
       </div>
-      <h4 className="font-heading fw-bold text-navy-deep mb-2">{title}</h4>
-      <p className="text-muted max-w-md mx-auto mb-4" style={{ maxWidth: "420px" }}>
+      <h4 className="font-heading fw-bold text-white mb-2">{title}</h4>
+      <p className="text-white-50 max-w-md mx-auto mb-4 font-heading" style={{ maxWidth: "420px" }}>
         {description}
       </p>
 
       {actionLabel && actionPath && (
-        <Link to={actionPath} className="btn btn-gt-primary px-4 py-2">
+        <Link to={actionPath} className="btn btn-gt-primary px-4 py-2 font-heading fw-bold">
           {actionLabel}
         </Link>
       )}
 
       {actionLabel && onAction && !actionPath && (
-        <button onClick={onAction} className="btn btn-gt-primary px-4 py-2">
+        <button onClick={onAction} className="btn btn-gt-primary px-4 py-2 font-heading fw-bold">
           {actionLabel}
         </button>
       )}

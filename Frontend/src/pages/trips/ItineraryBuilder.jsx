@@ -250,13 +250,13 @@ const ItineraryBuilder = () => {
 
   const getCategoryColor = (cat) => {
     switch (cat) {
-      case "Sightseeing": return "#0EA5E9";
-      case "Food": return "#FF8A3D";
-      case "Adventure": return "#22C55E";
+      case "Sightseeing": return "#7C3AED";
+      case "Food": return "#EC4899";
+      case "Adventure": return "#F97316";
       case "Culture": return "#8B5CF6";
-      case "Shopping": return "#FFD166";
+      case "Shopping": return "#06B6D4";
       case "Nature":
-      default: return "#06D6C9";
+      default: return "#10B981";
     }
   };
 
@@ -266,9 +266,9 @@ const ItineraryBuilder = () => {
 
   if (error || !trip) {
     return (
-      <div className="gt-card p-5 text-center my-4">
-        <h5 className="font-heading text-navy-deep fw-bold mb-2">{error || "Trip not found"}</h5>
-        <Link to="/my-trips" className="btn btn-gt-primary px-4">Back to My Trips</Link>
+      <div className="gt-glass-card p-5 text-center my-4">
+        <h5 className="font-heading text-white fw-bold mb-2">{error || "Trip not found"}</h5>
+        <Link to="/my-trips" className="btn btn-gt-primary px-4 font-heading">Back to My Trips</Link>
       </div>
     );
   }
@@ -284,11 +284,11 @@ const ItineraryBuilder = () => {
         breadcrumbs={[{ label: "My Trips", path: "/my-trips" }, { label: "Itinerary Builder" }]}
         action={
           <div className="d-flex gap-2">
-            <Link to={`/itinerary/${trip.id}/view`} className="btn btn-gt-outline btn-sm fw-semibold">
+            <Link to={`/itinerary/${trip.id}/view`} className="btn btn-gt-outline btn-sm fw-semibold font-heading">
               <i className="bi bi-eye me-1"></i> Preview Itinerary
             </Link>
-            <button onClick={handleOpenAddStopModal} className="btn btn-gt-primary btn-sm fw-bold">
-              <i className="bi bi-plus-circle me-1"></i> + Add City Stop
+            <button onClick={handleOpenAddStopModal} className="btn btn-gt-primary btn-sm fw-bold font-heading">
+              <i className="bi bi-plus-circle me-1"></i> Add City Stop
             </button>
           </div>
         }
@@ -313,19 +313,19 @@ const ItineraryBuilder = () => {
             const stopItems = itineraryItems.filter((item) => String(item.trip_stop_id) === String(stop.id));
 
             return (
-              <div key={stop.id} className="gt-card p-4 p-md-5">
+              <div key={stop.id} className="gt-glass-card p-4 p-md-5">
                 {/* Stop Header */}
-                <div className="d-flex flex-wrap align-items-center justify-content-between pb-3 mb-4 border-bottom gap-3">
+                <div className="d-flex flex-wrap align-items-center justify-content-between pb-3 mb-4 border-bottom border-white border-opacity-10 gap-3">
                   <div className="d-flex align-items-center gap-3">
-                    <span className="badge bg-ocean-gradient text-white fs-6 p-2 rounded-3 fw-bold">
+                    <span className="badge bg-saas-gradient text-white fs-6 p-2 rounded-3 fw-bold font-heading">
                       STOP {index + 1}
                     </span>
                     <div>
-                      <h3 className="font-heading fw-extrabold text-navy-deep mb-0">
-                        {cityName.toUpperCase()} <span className="fs-6 text-muted font-sans font-normal">({countryName}) {flag}</span>
+                      <h3 className="font-heading fw-extrabold text-white mb-0">
+                        {cityName.toUpperCase()} <span className="fs-6 text-white-50 font-sans font-normal">({countryName}) {flag}</span>
                       </h3>
-                      <span className="text-muted small">
-                        <i className="bi bi-calendar-event me-1 text-ocean-blue"></i>
+                      <span className="text-white-50 small font-heading">
+                        <i className="bi bi-calendar-event me-1 text-saas-gradient"></i>
                         {formatDateRange(stop.arrival_date, stop.departure_date)} ({calculateTripDays(stop.arrival_date, stop.departure_date)} Days)
                       </span>
                     </div>
@@ -336,7 +336,7 @@ const ItineraryBuilder = () => {
                     <button
                       onClick={() => handleMoveStop(index, "up")}
                       disabled={index === 0}
-                      className="btn btn-sm btn-light border px-2.5"
+                      className="btn btn-sm btn-gt-outline px-2.5"
                       title="Move Stop Up"
                     >
                       <i className="bi bi-arrow-up"></i>
@@ -344,7 +344,7 @@ const ItineraryBuilder = () => {
                     <button
                       onClick={() => handleMoveStop(index, "down")}
                       disabled={index === stops.length - 1}
-                      className="btn btn-sm btn-light border px-2.5"
+                      className="btn btn-sm btn-gt-outline px-2.5"
                       title="Move Stop Down"
                     >
                       <i className="bi bi-arrow-down"></i>
@@ -352,7 +352,7 @@ const ItineraryBuilder = () => {
 
                     <button
                       onClick={() => handleDeleteStop(stop.id)}
-                      className="btn btn-outline-danger btn-sm rounded-pill px-3"
+                      className="btn btn-outline-danger btn-sm rounded-pill px-3 font-heading"
                     >
                       <i className="bi bi-trash me-1"></i> Remove Stop
                     </button>
@@ -370,7 +370,7 @@ const ItineraryBuilder = () => {
                       return (
                         <div
                           key={item.id}
-                          className="p-3 bg-light rounded-4 d-flex flex-wrap align-items-center justify-content-between gap-3 border transition-all hover-shadow"
+                          className="p-3 bg-dark bg-opacity-60 rounded-4 d-flex flex-wrap align-items-center justify-content-between gap-3 border border-white border-opacity-10 transition-all hover-shadow"
                         >
                           <div className="d-flex align-items-center gap-3">
                             {/* Category Indicator Dot */}
@@ -381,19 +381,19 @@ const ItineraryBuilder = () => {
 
                             <div>
                               <div className="d-flex align-items-center gap-2 mb-1">
-                                <span className="badge bg-white text-navy-deep border fw-bold px-2 py-1 small">
-                                  <i className="bi bi-clock me-1 text-ocean-blue"></i>
+                                <span className="badge bg-dark text-white border border-white border-opacity-20 fw-bold px-2 py-1 small font-heading">
+                                  <i className="bi bi-clock me-1 text-saas-gradient"></i>
                                   {item.start_time} – {item.end_time}
                                 </span>
-                                <span className="badge bg-navy-deep text-aqua px-2 py-1 small">{cat}</span>
+                                <span className="badge bg-saas-gradient text-white px-2 py-1 small font-heading">{cat}</span>
                               </div>
-                              <h6 className="mb-0 font-heading fw-bold text-navy-deep">{actName}</h6>
-                              {item.notes && <p className="text-muted small mb-0 mt-1">{item.notes}</p>}
+                              <h6 className="mb-0 font-heading fw-bold text-white">{actName}</h6>
+                              {item.notes && <p className="text-white-50 small mb-0 mt-1">{item.notes}</p>}
                             </div>
                           </div>
 
                           <div className="d-flex align-items-center gap-3 ms-auto">
-                            <span className="fw-extrabold text-navy-deep fs-6">
+                            <span className="fw-extrabold text-white fs-6 font-heading">
                               {cost > 0 ? `€${cost}` : "Free"}
                             </span>
                             <button
@@ -408,8 +408,8 @@ const ItineraryBuilder = () => {
                       );
                     })
                   ) : (
-                    <div className="text-center py-4 bg-light rounded-4 border-dashed">
-                      <p className="text-muted small mb-0">Nothing planned for this city stop yet.</p>
+                    <div className="text-center py-4 bg-dark bg-opacity-50 rounded-4 border border-dashed border-white border-opacity-10">
+                      <p className="text-white-50 small mb-0 font-heading">Nothing planned for this city stop yet.</p>
                     </div>
                   )}
                 </div>
@@ -420,7 +420,7 @@ const ItineraryBuilder = () => {
                   onClick={() => handleOpenAddActivityModal(stop)}
                   className="btn btn-gt-outline btn-sm w-100 py-2.5 font-heading fw-semibold d-flex align-items-center justify-content-center gap-2"
                 >
-                  <i className="bi bi-plus-circle-fill fs-6 text-ocean-blue"></i>
+                  <i className="bi bi-plus-circle-fill fs-6 text-saas-gradient"></i>
                   <span>Add Activity to {cityName}</span>
                 </button>
               </div>
@@ -431,19 +431,19 @@ const ItineraryBuilder = () => {
         <EmptyState
           title="No destinations added yet 🌎"
           description="Start building your multi-city itinerary by adding your first city stop."
-          actionLabel="+ Add City Stop"
+          actionLabel="Add City Stop"
           onAction={handleOpenAddStopModal}
         />
       )}
 
       {/* Add Stop Modal */}
       {showAddStopModal && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 1050 }}>
+        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(7,11,26,0.85)", zIndex: 1050 }}>
           <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content gt-card border-0 shadow-lg overflow-hidden">
-              <div className="modal-header bg-navy-deep text-white">
+            <div className="modal-content gt-glass-card border border-white border-opacity-20 shadow-lg overflow-hidden">
+              <div className="modal-header border-bottom border-white border-opacity-10 text-white">
                 <h5 className="modal-title font-heading fw-bold d-flex align-items-center gap-2">
-                  <i className="bi bi-geo-alt text-aqua"></i> Add City Stop
+                  <i className="bi bi-geo-alt text-saas-gradient"></i> Add City Stop
                 </h5>
                 <button type="button" className="btn-close btn-close-white" onClick={() => setShowAddStopModal(false)}></button>
               </div>
@@ -457,9 +457,9 @@ const ItineraryBuilder = () => {
                   )}
 
                   <div className="mb-3">
-                    <label className="form-label text-navy-deep fw-semibold">Select City</label>
+                    <label className="form-label text-white fw-semibold font-heading">Select City</label>
                     <select
-                      className="form-select bg-light border-0"
+                      className="form-select bg-dark text-white border-white border-opacity-20"
                       value={selectedCityId}
                       onChange={(e) => setSelectedCityId(e.target.value)}
                       required
@@ -474,20 +474,20 @@ const ItineraryBuilder = () => {
 
                   <div className="row g-3">
                     <div className="col-6">
-                      <label className="form-label text-navy-deep fw-semibold small">Arrival Date</label>
+                      <label className="form-label text-white fw-semibold small font-heading">Arrival Date</label>
                       <input
                         type="date"
-                        className="form-control form-control-sm bg-light"
+                        className="form-control form-control-sm bg-dark text-white border-white border-opacity-20"
                         value={stopArrivalDate}
                         onChange={(e) => setStopArrivalDate(e.target.value)}
                         required
                       />
                     </div>
                     <div className="col-6">
-                      <label className="form-label text-navy-deep fw-semibold small">Departure Date</label>
+                      <label className="form-label text-white fw-semibold small font-heading">Departure Date</label>
                       <input
                         type="date"
-                        className="form-control form-control-sm bg-light"
+                        className="form-control form-control-sm bg-dark text-white border-white border-opacity-20"
                         value={stopDepartureDate}
                         onChange={(e) => setStopDepartureDate(e.target.value)}
                         required
@@ -496,11 +496,11 @@ const ItineraryBuilder = () => {
                   </div>
                 </div>
 
-                <div className="modal-footer bg-light border-top">
-                  <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => setShowAddStopModal(false)}>
+                <div className="modal-footer border-top border-white border-opacity-10">
+                  <button type="button" className="btn btn-gt-outline btn-sm font-heading" onClick={() => setShowAddStopModal(false)}>
                     Cancel
                   </button>
-                  <button type="submit" disabled={addingStop} className="btn btn-gt-primary btn-sm px-4 fw-bold">
+                  <button type="submit" disabled={addingStop} className="btn btn-gt-primary btn-sm px-4 fw-bold font-heading">
                     {addingStop ? "Adding..." : "Add City Stop"}
                   </button>
                 </div>
@@ -512,12 +512,12 @@ const ItineraryBuilder = () => {
 
       {/* Add Activity to Stop Modal */}
       {activeStopForActivity && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 1050 }}>
+        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(7,11,26,0.85)", zIndex: 1050 }}>
           <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content gt-card border-0 shadow-lg overflow-hidden">
-              <div className="modal-header bg-navy-deep text-white">
+            <div className="modal-content gt-glass-card border border-white border-opacity-20 shadow-lg overflow-hidden">
+              <div className="modal-header border-bottom border-white border-opacity-10 text-white">
                 <h5 className="modal-title font-heading fw-bold d-flex align-items-center gap-2">
-                  <i className="bi bi-plus-circle text-aqua"></i> Add Activity to {activeStopForActivity.city?.city_name || "Stop"}
+                  <i className="bi bi-plus-circle text-saas-gradient"></i> Add Activity to {activeStopForActivity.city?.city_name || "Stop"}
                 </h5>
                 <button type="button" className="btn-close btn-close-white" onClick={() => setActiveStopForActivity(null)}></button>
               </div>
@@ -533,9 +533,9 @@ const ItineraryBuilder = () => {
                   {cityActivities.length > 0 ? (
                     <>
                       <div className="mb-3">
-                        <label className="form-label text-navy-deep fw-semibold small">Select Activity</label>
+                        <label className="form-label text-white fw-semibold small font-heading">Select Activity</label>
                         <select
-                          className="form-select bg-light border-0"
+                          className="form-select bg-dark text-white border-white border-opacity-20"
                           value={selectedActivityId}
                           onChange={(e) => setSelectedActivityId(e.target.value)}
                           required
@@ -549,37 +549,37 @@ const ItineraryBuilder = () => {
                       </div>
 
                       <div className="mb-3">
-                        <label className="form-label text-navy-deep fw-semibold small">Date</label>
+                        <label className="form-label text-white fw-semibold small font-heading">Date</label>
                         <input
                           type="date"
-                          className="form-control form-control-sm bg-light"
+                          className="form-control form-control-sm bg-dark text-white border-white border-opacity-20"
                           value={itemDate}
                           onChange={(e) => setItemDate(e.target.value)}
                           min={activeStopForActivity.arrival_date}
                           max={activeStopForActivity.departure_date}
                           required
                         />
-                        <span className="text-muted fs-7 d-block mt-1">
+                        <span className="text-white-50 fs-7 d-block mt-1 font-heading">
                           Must be between {activeStopForActivity.arrival_date} and {activeStopForActivity.departure_date}
                         </span>
                       </div>
 
                       <div className="row g-2 mb-3">
                         <div className="col-6">
-                          <label className="form-label text-navy-deep fw-semibold small">Start Time</label>
+                          <label className="form-label text-white fw-semibold small font-heading">Start Time</label>
                           <input
                             type="time"
-                            className="form-control form-control-sm bg-light"
+                            className="form-control form-control-sm bg-dark text-white border-white border-opacity-20"
                             value={startTime}
                             onChange={(e) => setStartTime(e.target.value)}
                             required
                           />
                         </div>
                         <div className="col-6">
-                          <label className="form-label text-navy-deep fw-semibold small">End Time</label>
+                          <label className="form-label text-white fw-semibold small font-heading">End Time</label>
                           <input
                             type="time"
-                            className="form-control form-control-sm bg-light"
+                            className="form-control form-control-sm bg-dark text-white border-white border-opacity-20"
                             value={endTime}
                             onChange={(e) => setEndTime(e.target.value)}
                             required
@@ -588,10 +588,10 @@ const ItineraryBuilder = () => {
                       </div>
 
                       <div className="mb-3">
-                        <label className="form-label text-navy-deep fw-semibold small">Notes (Optional)</label>
+                        <label className="form-label text-white fw-semibold small font-heading">Notes (Optional)</label>
                         <input
                           type="text"
-                          className="form-control form-control-sm bg-light"
+                          className="form-control form-control-sm bg-dark text-white border-white border-opacity-20"
                           placeholder="e.g. Booking ref, meeting spot..."
                           value={itemNotes}
                           onChange={(e) => setItemNotes(e.target.value)}
@@ -600,17 +600,17 @@ const ItineraryBuilder = () => {
                     </>
                   ) : (
                     <div className="text-center py-3">
-                      <p className="text-muted small mb-0">No pre-seeded activities found for this city.</p>
+                      <p className="text-white-50 small mb-0 font-heading">No pre-seeded activities found for this city.</p>
                     </div>
                   )}
                 </div>
 
                 {cityActivities.length > 0 && (
-                  <div className="modal-footer bg-light border-top">
-                    <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => setActiveStopForActivity(null)}>
+                  <div className="modal-footer border-top border-white border-opacity-10">
+                    <button type="button" className="btn btn-gt-outline btn-sm font-heading" onClick={() => setActiveStopForActivity(null)}>
                       Cancel
                     </button>
-                    <button type="submit" disabled={addingActivity} className="btn btn-gt-primary btn-sm px-4 fw-bold">
+                    <button type="submit" disabled={addingActivity} className="btn btn-gt-primary btn-sm px-4 fw-bold font-heading">
                       {addingActivity ? "Adding..." : "Add to Itinerary"}
                     </button>
                   </div>

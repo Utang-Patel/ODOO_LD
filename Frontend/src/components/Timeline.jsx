@@ -15,13 +15,13 @@ const Timeline = ({
 }) => {
   const getCategoryColor = (cat) => {
     switch (cat) {
-      case "Sightseeing": return "#0EA5E9";
-      case "Food": return "#FF8A3D";
-      case "Adventure": return "#22C55E";
+      case "Sightseeing": return "#7C3AED";
+      case "Food": return "#EC4899";
+      case "Adventure": return "#F97316";
       case "Culture": return "#8B5CF6";
-      case "Shopping": return "#FFD166";
+      case "Shopping": return "#06B6D4";
       case "Nature":
-      default: return "#06D6C9";
+      default: return "#10B981";
     }
   };
 
@@ -32,26 +32,26 @@ const Timeline = ({
   });
 
   return (
-    <div className={`gt-card mb-3 overflow-hidden ${isPast ? "opacity-75" : ""}`}>
+    <div className={`gt-glass-card mb-3 overflow-hidden ${isPast ? "opacity-75" : ""}`}>
       {/* Day Header */}
       <div
         onClick={onToggleExpand}
-        className={`p-3 p-md-4 d-flex align-items-center justify-content-between cursor-pointer border-bottom select-none ${
-          isToday ? "bg-navy-deep text-white" : "bg-light text-navy-deep"
+        className={`p-3 p-md-4 d-flex align-items-center justify-content-between cursor-pointer border-bottom border-white border-opacity-10 select-none ${
+          isToday ? "bg-dark bg-opacity-75 text-white" : "bg-transparent text-white"
         }`}
       >
         <div className="d-flex align-items-center gap-3">
-          <button className="btn btn-sm p-0 border-0 text-muted">
+          <button className="btn btn-sm p-0 border-0 text-white-50">
             <i className={`bi ${isExpanded ? "bi-chevron-down" : "bi-chevron-right"} fs-5`}></i>
           </button>
           <div>
             <div className="d-flex align-items-center gap-2">
-              <h5 className={`font-heading fw-extrabold mb-0 ${isToday ? "text-aqua" : "text-navy-deep"}`}>
+              <h5 className={`font-heading fw-extrabold mb-0 ${isToday ? "text-saas-gradient" : "text-white"}`}>
                 DAY {dayIndex + 1} — {formattedDayStr.toUpperCase()}
               </h5>
-              {isToday && <span className="badge bg-ocean-gradient text-white fw-bold px-2 py-1 small">TODAY</span>}
+              {isToday && <span className="badge bg-saas-gradient text-white fw-bold px-2 py-1 small font-heading">TODAY</span>}
             </div>
-            <span className={`small ${isToday ? "text-white-50" : "text-muted"}`}>
+            <span className="small text-white-50 font-heading">
               {items.length} {items.length === 1 ? "Activity Scheduled" : "Activities Scheduled"}
             </span>
           </div>
@@ -62,7 +62,7 @@ const Timeline = ({
             e.stopPropagation();
             onAddActivity(dayDate);
           }}
-          className={`btn btn-sm ${isToday ? "btn-gt-primary" : "btn-gt-outline"} px-3 fw-bold`}
+          className={`btn btn-sm ${isToday ? "btn-gt-primary" : "btn-gt-outline"} px-3 fw-bold font-heading`}
         >
           <i className="bi bi-plus-circle me-1"></i> Add Activity
         </button>
@@ -101,31 +101,31 @@ const Timeline = ({
                       ></span>
 
                       {/* Card Content */}
-                      <div className="p-3 bg-light rounded-4 border d-flex flex-wrap align-items-center justify-content-between gap-3 hover-shadow transition-all">
+                      <div className="p-3 bg-dark bg-opacity-60 rounded-4 border border-white border-opacity-10 d-flex flex-wrap align-items-center justify-content-between gap-3 hover-shadow transition-all">
                         <div className="d-flex align-items-center gap-3">
-                          <span className="badge bg-white text-navy-deep border fw-bold px-2.5 py-1.5 shadow-sm">
-                            <i className="bi bi-clock me-1 text-ocean-blue"></i>
+                          <span className="badge bg-dark text-white border border-white border-opacity-20 fw-bold px-2.5 py-1.5 shadow-sm font-heading">
+                            <i className="bi bi-clock me-1 text-saas-gradient"></i>
                             {item.start_time} – {item.end_time}
                           </span>
 
                           <div>
                             <div className="d-flex align-items-center gap-2 mb-1">
-                              <span className="badge text-white px-2 py-0.5 small" style={{ backgroundColor: color }}>
+                              <span className="badge text-white px-2 py-0.5 small font-heading" style={{ backgroundColor: color }}>
                                 {cat}
                               </span>
                               {item.tripStop?.city?.city_name && (
-                                <span className="text-muted small fw-semibold">
+                                <span className="text-white-50 small fw-semibold font-heading">
                                   📍 {item.tripStop.city.city_name}
                                 </span>
                               )}
                             </div>
-                            <h6 className="font-heading fw-extrabold text-navy-deep mb-0">{actName}</h6>
-                            {item.notes && <p className="text-muted small mb-0 mt-1">{item.notes}</p>}
+                            <h6 className="font-heading fw-extrabold text-white mb-0">{actName}</h6>
+                            {item.notes && <p className="text-white-50 small mb-0 mt-1">{item.notes}</p>}
                           </div>
                         </div>
 
                         <div className="d-flex align-items-center gap-3 ms-auto">
-                          <span className="fw-extrabold text-navy-deep fs-6">
+                          <span className="fw-extrabold text-white fs-6 font-heading">
                             {cost > 0 ? `€${cost}` : "Free"}
                           </span>
 
@@ -143,10 +143,10 @@ const Timeline = ({
                 })}
               </div>
             ) : (
-              <div className="text-center py-4 bg-light rounded-4 border-dashed">
-                <p className="text-muted small mb-2">No activities scheduled for this date.</p>
-                <button onClick={() => onAddActivity(dayDate)} className="btn btn-sm btn-gt-outline px-3">
-                  + Add Activity
+              <div className="text-center py-4 bg-dark bg-opacity-50 rounded-4 border border-dashed border-white border-opacity-10">
+                <p className="text-white-50 small mb-2 font-heading">No activities scheduled for this date.</p>
+                <button onClick={() => onAddActivity(dayDate)} className="btn btn-sm btn-gt-outline px-3 font-heading">
+                  Add Activity
                 </button>
               </div>
             )}

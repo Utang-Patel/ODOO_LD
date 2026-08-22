@@ -136,15 +136,15 @@ const Profile = () => {
 
   if (error || !profile) {
     return (
-      <div className="gt-card p-5 text-center my-4">
-        <h5 className="font-heading text-navy-deep fw-bold mb-2">{error || "Profile not found"}</h5>
+      <div className="gt-glass-card p-5 text-center my-4">
+        <h5 className="font-heading text-white fw-bold mb-2">{error || "Profile not found"}</h5>
         <button onClick={fetchProfileData} className="btn btn-gt-primary px-4">Retry</button>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="d-flex flex-column gap-4 py-2">
       <PageHeader
         title="My Profile & Settings 👤"
         subtitle="Manage your GlobeTrotter account details, preferences, and saved destinations."
@@ -157,61 +157,49 @@ const Profile = () => {
         </div>
       )}
 
-      <div className="row g-4">
+      <div className="row g-4 g-xl-5">
         {/* Left Column: Profile Card Overview */}
         <div className="col-lg-4">
-          <div className="gt-card p-4 text-center h-100 d-flex flex-column justify-content-between">
+          <div className="gt-glass-card p-4 p-md-5 text-center h-100 d-flex flex-column justify-content-between shadow-lg">
             <div>
-              {/* Profile Avatar / Photo */}
-              <div className="position-relative d-inline-block mb-3">
-                {profile.profile_image ? (
-                  <img
-                    src={profile.profile_image}
-                    alt={profile.name}
-                    className="rounded-circle shadow border border-3 border-white"
-                    style={{ width: "110px", height: "110px", objectFit: "cover" }}
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                    }}
-                  />
-                ) : (
-                  <div
-                    className="rounded-circle bg-navy-deep text-aqua font-heading fw-extrabold fs-2 d-flex align-items-center justify-content-center mx-auto shadow border border-3 border-white"
-                    style={{ width: "110px", height: "110px" }}
-                  >
-                    {getInitials(profile.name)}
-                  </div>
-                )}
+              {/* Default Name Word Avatar Badge */}
+              <div className="position-relative d-inline-block mb-4">
+                <div
+                  className="rounded-circle bg-saas-gradient text-white font-heading fw-extrabold fs-1 d-flex align-items-center justify-content-center mx-auto shadow-lg border border-4 border-white border-opacity-25"
+                  style={{ width: "120px", height: "120px" }}
+                >
+                  {getInitials(profile.name)}
+                </div>
               </div>
 
-              <h4 className="font-heading fw-extrabold text-navy-deep mb-1">{profile.name}</h4>
-              <p className="text-muted small mb-3">{profile.email}</p>
+              <h3 className="font-heading fw-extrabold text-white mb-1">{profile.name}</h3>
+              <p className="text-white-50 small mb-4 font-heading">{profile.email}</p>
 
-              <span className="badge bg-light text-navy-deep border px-3 py-1.5 rounded-pill fw-semibold mb-4">
+              <span className="badge bg-dark text-saas-gradient border border-primary px-3.5 py-2 rounded-pill fw-semibold mb-4 font-heading fs-7">
                 Language: {profile.language === "hi" ? "Hindi (हिंदी)" : profile.language === "gu" ? "Gujarati (ગુજરાતી)" : "English (EN)"}
               </span>
 
               {/* Statistics Row */}
-              <div className="row g-2 p-3 bg-light rounded-4 border mb-4">
-                <div className="col-6 border-end">
-                  <span className="text-muted fs-7 d-block">Trips Planned</span>
-                  <span className="fw-extrabold text-navy-deep fs-5">{tripCount}</span>
+              <div className="row g-2 p-4 bg-dark rounded-4 border border-white border-opacity-10 mb-4">
+                <div className="col-6 border-end border-white border-opacity-10">
+                  <span className="text-white-50 fs-7 d-block font-heading mb-1">Trips Planned</span>
+                  <span className="fw-extrabold text-white fs-4 font-heading">{tripCount}</span>
                 </div>
                 <div className="col-6">
-                  <span className="text-muted fs-7 d-block">Saved Places</span>
-                  <span className="fw-extrabold text-navy-deep fs-5">{savedCities.length}</span>
+                  <span className="text-white-50 fs-7 d-block font-heading mb-1">Saved Places</span>
+                  <span className="fw-extrabold text-white fs-4 font-heading">{savedCities.length}</span>
                 </div>
               </div>
             </div>
 
             {/* Logout Action */}
-            <div className="pt-3 border-top">
+            <div className="pt-4 border-top border-white border-opacity-10">
               <button
                 onClick={() => {
                   logout();
                   navigate("/login");
                 }}
-                className="btn btn-outline-danger w-100 fw-bold"
+                className="btn btn-outline-danger w-100 py-2.5 fw-bold font-heading"
               >
                 <i className="bi bi-box-arrow-right me-2"></i> Log Out
               </button>
@@ -221,8 +209,8 @@ const Profile = () => {
 
         {/* Right Column: Edit Settings Form */}
         <div className="col-lg-8">
-          <div className="gt-card p-4 p-md-5 mb-4">
-            <h5 className="font-heading fw-extrabold text-navy-deep mb-4">Personal Information & Preferences</h5>
+          <div className="gt-glass-card p-4 p-md-5 mb-4 shadow-lg">
+            <h5 className="font-heading fw-extrabold text-white mb-4">Personal Information & Preferences</h5>
 
             {editError && (
               <div className="alert alert-danger small p-2 mb-3 rounded-3">
@@ -231,43 +219,33 @@ const Profile = () => {
             )}
 
             <form onSubmit={handleUpdateProfile}>
-              <div className="row g-3 mb-3">
+              <div className="row g-3 g-md-4 mb-4">
                 <div className="col-md-6">
-                  <label className="form-label text-navy-deep fw-semibold small">Full Name</label>
+                  <label className="form-label text-white fw-semibold font-heading mb-2">Full Name</label>
                   <input
                     type="text"
-                    className="form-control bg-light border-0"
+                    className="form-control form-control-lg bg-dark text-white border-white border-opacity-20 shadow-none"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
                   />
                 </div>
                 <div className="col-md-6">
-                  <label className="form-label text-navy-deep fw-semibold small">Email Address (Read-only)</label>
+                  <label className="form-label text-white fw-semibold font-heading mb-2">Email Address (Read-only)</label>
                   <input
                     type="email"
                     readOnly
-                    className="form-control bg-light border-0 text-muted"
+                    className="form-control form-control-lg bg-dark text-muted border-white border-opacity-10 shadow-none"
                     value={profile.email}
                   />
                 </div>
               </div>
 
-              <div className="row g-3 mb-4">
+              <div className="row g-3 g-md-4 mb-4">
                 <div className="col-md-6">
-                  <label className="form-label text-navy-deep fw-semibold small">Profile Image URL (Optional)</label>
-                  <input
-                    type="url"
-                    className="form-control bg-light border-0"
-                    placeholder="https://example.com/avatar.jpg"
-                    value={profileImage}
-                    onChange={(e) => setProfileImage(e.target.value)}
-                  />
-                </div>
-                <div className="col-md-6">
-                  <label className="form-label text-navy-deep fw-semibold small">Language Preference</label>
+                  <label className="form-label text-white fw-semibold font-heading mb-2">Language Preference</label>
                   <select
-                    className="form-select bg-light border-0"
+                    className="form-select form-select-lg bg-dark text-white border-white border-opacity-20 shadow-none"
                     value={language}
                     onChange={(e) => setLanguage(e.target.value)}
                   >
@@ -278,8 +256,8 @@ const Profile = () => {
                 </div>
               </div>
 
-              <div className="d-flex justify-content-end">
-                <button type="submit" disabled={savingProfile} className="btn btn-gt-primary px-4 fw-bold">
+              <div className="d-flex justify-content-end pt-3 border-top border-white border-opacity-10">
+                <button type="submit" disabled={savingProfile} className="btn btn-gt-primary px-4 py-2.5 fw-bold font-heading">
                   {savingProfile ? "Saving..." : "Save Changes"}
                 </button>
               </div>
@@ -287,13 +265,13 @@ const Profile = () => {
           </div>
 
           {/* Danger Zone: Delete Account */}
-          <div className="gt-card p-4 border border-danger border-opacity-25 bg-danger bg-opacity-10">
+          <div className="gt-glass-card p-4 border border-danger border-opacity-25 bg-danger bg-opacity-10 shadow-sm">
             <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
               <div>
                 <h6 className="font-heading fw-bold text-danger mb-1">Danger Zone — Delete Account</h6>
-                <p className="text-muted small mb-0">Permanently delete your account and all associated trips and data.</p>
+                <p className="text-white-50 small mb-0 font-heading">Permanently delete your account and all associated trips and data.</p>
               </div>
-              <button onClick={() => setShowDeleteModal(true)} className="btn btn-danger btn-sm px-3 fw-bold">
+              <button onClick={() => setShowDeleteModal(true)} className="btn btn-danger btn-sm px-3.5 py-2 fw-bold font-heading">
                 Delete Account
               </button>
             </div>
@@ -302,19 +280,19 @@ const Profile = () => {
       </div>
 
       {/* Saved Destinations Section */}
-      <div className="mt-5">
+      <div className="mt-4 pt-3">
         <div className="d-flex align-items-center justify-content-between mb-4">
           <div>
-            <h4 className="font-heading fw-extrabold text-navy-deep mb-1">Saved Destinations ❤️</h4>
-            <p className="text-muted small mb-0">Your favorite travel places saved for future itineraries.</p>
+            <h4 className="font-heading fw-extrabold text-white mb-1">Saved Destinations ❤️</h4>
+            <p className="text-white-50 small mb-0 font-heading">Your favorite travel places saved for future itineraries.</p>
           </div>
-          <Link to="/cities" className="btn btn-gt-outline btn-sm fw-semibold">
+          <Link to="/cities" className="btn btn-gt-outline btn-sm px-3.5 py-2 fw-semibold font-heading">
             Explore Cities <i className="bi bi-arrow-right ms-1"></i>
           </Link>
         </div>
 
         {savedCities.length > 0 ? (
-          <div className="row g-4">
+          <div className="row g-4 g-xl-5">
             {savedCities.map((city) => (
               <div key={city.id} className="col-md-6 col-lg-4">
                 <DestinationCard
@@ -326,9 +304,9 @@ const Profile = () => {
             ))}
           </div>
         ) : (
-          <div className="gt-card p-5 text-center">
-            <p className="text-muted mb-3">Save places you want to visit ❤️</p>
-            <Link to="/cities" className="btn btn-gt-primary px-4">
+          <div className="gt-glass-card p-5 text-center">
+            <p className="text-white-50 mb-3 font-heading">Save places you want to visit ❤️</p>
+            <Link to="/cities" className="btn btn-gt-primary px-4 py-2.5 font-heading fw-bold">
               Explore Destinations
             </Link>
           </div>

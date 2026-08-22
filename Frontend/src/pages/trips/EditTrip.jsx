@@ -142,15 +142,15 @@ const EditTrip = () => {
         </div>
       )}
 
-      <div className="gt-card p-4 p-md-5 max-w-3xl mx-auto">
+      <div className="gt-glass-card p-4 p-md-5 mx-auto" style={{ maxWidth: "720px" }}>
         <form onSubmit={handleSubmit}>
           {/* Trip Name */}
           <div className="mb-4">
-            <label className="form-label text-navy-deep fw-semibold">Trip Name</label>
+            <label className="form-label text-white fw-semibold font-heading">Trip Name</label>
             <input
               type="text"
               name="trip_name"
-              className="form-control form-control-lg bg-light border-0 shadow-none"
+              className="form-control form-control-lg bg-dark text-white border-white border-opacity-20 shadow-none"
               value={formData.trip_name}
               onChange={handleChange}
               required
@@ -160,22 +160,22 @@ const EditTrip = () => {
           {/* Dates */}
           <div className="row g-3 mb-4">
             <div className="col-md-6">
-              <label className="form-label text-navy-deep fw-semibold">Start Date</label>
+              <label className="form-label text-white fw-semibold font-heading">Start Date</label>
               <input
                 type="date"
                 name="start_date"
-                className="form-control form-control-lg bg-light border-0 shadow-none"
+                className="form-control form-control-lg bg-dark text-white border-white border-opacity-20 shadow-none"
                 value={formData.start_date}
                 onChange={handleChange}
                 required
               />
             </div>
             <div className="col-md-6">
-              <label className="form-label text-navy-deep fw-semibold">End Date</label>
+              <label className="form-label text-white fw-semibold font-heading">End Date</label>
               <input
                 type="date"
                 name="end_date"
-                className="form-control form-control-lg bg-light border-0 shadow-none"
+                className="form-control form-control-lg bg-dark text-white border-white border-opacity-20 shadow-none"
                 value={formData.end_date}
                 onChange={handleChange}
                 required
@@ -186,23 +186,23 @@ const EditTrip = () => {
           {/* Budget Limit & Currency */}
           <div className="row g-3 mb-4">
             <div className="col-md-8">
-              <label className="form-label text-navy-deep fw-semibold">Budget Limit (Optional)</label>
+              <label className="form-label text-white fw-semibold font-heading">Budget Limit (Optional)</label>
               <input
                 type="number"
                 step="0.01"
                 min="1"
                 name="budget_limit"
-                className="form-control form-control-lg bg-light border-0 shadow-none"
+                className="form-control form-control-lg bg-dark text-white border-white border-opacity-20 shadow-none"
                 placeholder="e.g. 100000"
                 value={formData.budget_limit}
                 onChange={handleChange}
               />
             </div>
             <div className="col-md-4">
-              <label className="form-label text-navy-deep fw-semibold">Currency</label>
+              <label className="form-label text-white fw-semibold font-heading">Currency</label>
               <select
                 name="currency"
-                className="form-select form-select-lg bg-light border-0 shadow-none"
+                className="form-select form-select-lg bg-dark text-white border-white border-opacity-20 shadow-none"
                 value={formData.currency}
                 onChange={handleChange}
               >
@@ -216,19 +216,19 @@ const EditTrip = () => {
 
           {/* Description */}
           <div className="mb-4">
-            <label className="form-label text-navy-deep fw-semibold">Description</label>
+            <label className="form-label text-white fw-semibold font-heading">Description</label>
             <textarea
               name="description"
               rows="3"
-              className="form-control bg-light border-0 shadow-none"
+              className="form-control bg-dark text-white border-white border-opacity-20 shadow-none"
               value={formData.description}
               onChange={handleChange}
             ></textarea>
           </div>
 
           {/* Actions */}
-          <div className="d-flex align-items-center justify-content-end gap-3 pt-3 border-top">
-            <Link to="/my-trips" className="btn btn-gt-outline px-4">
+          <div className="d-flex align-items-center justify-content-end gap-3 pt-3 border-top border-white border-opacity-10">
+            <Link to="/my-trips" className="btn btn-gt-outline px-4 font-heading">
               Cancel
             </Link>
             <button type="submit" disabled={loading} className="btn btn-gt-primary px-4 py-2.5 font-heading fw-bold">

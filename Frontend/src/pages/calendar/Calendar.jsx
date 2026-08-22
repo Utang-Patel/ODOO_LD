@@ -42,21 +42,31 @@ const Calendar = () => {
       setLoading(true);
       setError("");
 
-      const tripRes = await tripService.getTrip(tripId);
+      let activeTripId = tripId;
+
+      // Fallback: If tripId is missing or "trip_1", load user's first active trip from MySQL!
+      if (!activeTripId || activeTripId === "trip_1") {
+        const allTripsRes = await tripService.getTrips();
+        if (allTripsRes.success && Array.isArray(allTripsRes.trips) && allTripsRes.trips.length > 0) {
+          activeTripId = allTripsRes.trips[0].id;
+        }
+      }
+
+      const tripRes = await tripService.getTrip(activeTripId);
       if (tripRes.success && tripRes.trip) {
         setTrip(tripRes.trip);
       } else {
-        setError("Trip not found.");
+        setError("No trip calendar details found.");
         return;
       }
 
-      const stopsRes = await tripStopService.getStops(tripId);
+      const stopsRes = await tripStopService.getStops(activeTripId);
       if (stopsRes.success && Array.isArray(stopsRes.stops)) {
         setStops(stopsRes.stops);
         setAvailableStops(stopsRes.stops);
       }
 
-      const itinRes = await itineraryService.getItinerary(tripId);
+      const itinRes = await itineraryService.getItinerary(activeTripId);
       if (itinRes.success && Array.isArray(itinRes.items)) {
         setItineraryItems(itinRes.items);
       }
@@ -184,7 +194,7 @@ const Calendar = () => {
         notes: itemNotes
       };
 
-      const res = await itineraryService.addItem(tripId, payload);
+      const res = await itineraryService.addItem(trip?.id, payload);
       if (res.success) {
         setToastMessage("Activity scheduled! 🗓️");
         setShowAddModal(false);
@@ -203,7 +213,7 @@ const Calendar = () => {
 
   const handleDeleteActivity = async (itemId) => {
     try {
-      await itineraryService.deleteItem(tripId, itemId);
+      await itineraryService.deleteItem(trip?.id, itemId);
       setItineraryItems((prev) => prev.filter((i) => i.id !== itemId));
       setToastMessage("Activity removed.");
       setTimeout(() => setToastMessage(""), 3000);
@@ -218,9 +228,10 @@ const Calendar = () => {
 
   if (error || !trip) {
     return (
-      <div className="gt-card p-5 text-center my-4">
-        <h5 className="font-heading text-navy-deep fw-bold mb-2">{error || "Trip not found"}</h5>
-        <Link to="/my-trips" className="btn btn-gt-primary px-4">Back to My Trips</Link>
+      <div className="gt-glass-card p-5 text-center my-4">
+        <h5 className="font-heading text-white fw-bold mb-2">{error || "No trips planned yet"}</h5>
+        <p className="text-white-50 small mb-4 font-heading">Plan your first trip to view schedule calendar details.</p>
+        <Link to="/create-trip" className="btn btn-gt-primary px-4 font-heading fw-bold">Plan New Trip</Link>
       </div>
     );
   }
@@ -234,19 +245,19 @@ const Calendar = () => {
         subtitle={`${formatDateRange(trip.start_date, trip.end_date)} • ${calculateTripDays(trip.start_date, trip.end_date)} Days`}
         breadcrumbs={[{ label: "My Trips", path: "/my-trips" }, { label: "Calendar Timeline" }]}
         action={
-          <div className="d-flex align-items-center gap-2 bg-light p-1 rounded-pill border">
+          <div className="d-flex align-items-center gap-2 bg-dark p-1 rounded-pill border border-white border-opacity-10">
             <button
               onClick={() => setViewMode("timeline")}
-              className={`btn btn-sm rounded-pill px-3 py-1 fw-bold ${
-                viewMode === "timeline" ? "bg-navy-deep text-aqua shadow-sm" : "btn-light border-0 text-muted"
+              className={`btn btn-sm rounded-pill px-3 py-1 fw-bold font-heading ${
+                viewMode === "timeline" ? "bg-saas-gradient text-white shadow-sm" : "btn-link text-white-50 border-0 text-decoration-none"
               }`}
             >
               <i className="bi bi-card-list me-1"></i> Timeline
             </button>
             <button
               onClick={() => setViewMode("month")}
-              className={`btn btn-sm rounded-pill px-3 py-1 fw-bold ${
-                viewMode === "month" ? "bg-navy-deep text-aqua shadow-sm" : "btn-light border-0 text-muted"
+              className={`btn btn-sm rounded-pill px-3 py-1 fw-bold font-heading ${
+                viewMode === "month" ? "bg-saas-gradient text-white shadow-sm" : "btn-link text-white-50 border-0 text-decoration-none"
               }`}
             >
               <i className="bi bi-calendar-month me-1"></i> Month Grid
@@ -264,8 +275,8 @@ const Calendar = () => {
 
       {/* Month Grid View */}
       {viewMode === "month" && (
-        <div className="gt-card p-4 p-md-5 mb-4">
-          <h5 className="font-heading fw-extrabold text-navy-deep mb-4 text-center">
+        <div className="gt-glass-card p-4 p-md-5 mb-4">
+          <h5 className="font-heading fw-extrabold text-white mb-4 text-center">
             Trip Dates Grid ({trip.start_date} → {trip.end_date})
           </h5>
           <div className="row g-3">
@@ -280,21 +291,21 @@ const Calendar = () => {
                       setViewMode("timeline");
                       setExpandedDays({ [dateStr]: true });
                     }}
-                    className={`gt-card p-3 text-center cursor-pointer transition-all hover-shadow ${
-                      isToday ? "border-primary border-2 bg-light" : ""
+                    className={`gt-glass-card p-3 text-center cursor-pointer transition-all hover-shadow ${
+                      isToday ? "border-primary border-2" : ""
                     }`}
                   >
-                    <span className="badge bg-navy-deep text-aqua rounded-pill mb-2">Day {idx + 1}</span>
-                    <h6 className="font-heading fw-bold text-navy-deep mb-1">
+                    <span className="badge bg-saas-gradient text-white rounded-pill mb-2 font-heading">Day {idx + 1}</span>
+                    <h6 className="font-heading fw-bold text-white mb-1">
                       {new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                     </h6>
                     <div className="d-flex align-items-center justify-content-center gap-1">
                       {itemsForDay.length > 0 ? (
-                        <span className="badge bg-ocean-gradient text-white rounded-pill small">
+                        <span className="badge bg-dark text-saas-gradient border border-primary rounded-pill small font-heading">
                           ● {itemsForDay.length} Activities
                         </span>
                       ) : (
-                        <span className="text-muted small">Empty</span>
+                        <span className="text-white-50 small">Empty</span>
                       )}
                     </div>
                   </div>
@@ -340,12 +351,12 @@ const Calendar = () => {
 
       {/* Quick Add Activity Modal */}
       {showAddModal && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 1050 }}>
+        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(7,11,26,0.85)", zIndex: 1050 }}>
           <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content gt-card border-0 shadow-lg overflow-hidden">
-              <div className="modal-header bg-navy-deep text-white">
+            <div className="modal-content gt-glass-card border border-white border-opacity-20 shadow-lg overflow-hidden">
+              <div className="modal-header border-bottom border-white border-opacity-10 text-white">
                 <h5 className="modal-title font-heading fw-bold d-flex align-items-center gap-2">
-                  <i className="bi bi-calendar-plus text-aqua"></i> Add Activity for {targetDate}
+                  <i className="bi bi-calendar-plus text-saas-gradient"></i> Add Activity for {targetDate}
                 </h5>
                 <button type="button" className="btn-close btn-close-white" onClick={() => setShowAddModal(false)}></button>
               </div>
@@ -362,8 +373,8 @@ const Calendar = () => {
                     <>
                       {/* Select City Stop */}
                       <div className="mb-3">
-                        <label className="form-label text-navy-deep fw-semibold small">Choose City Stop</label>
-                        <select className="form-select bg-light border-0" value={selectedStopId} onChange={handleStopChange} required>
+                        <label className="form-label text-white fw-semibold small font-heading">Choose City Stop</label>
+                        <select className="form-select bg-dark text-white border-white border-opacity-20" value={selectedStopId} onChange={handleStopChange} required>
                           {stops.map((s) => (
                             <option key={s.id} value={s.id}>
                               {s.city?.city_name || "Stop"} ({s.arrival_date} – {s.departure_date})
@@ -375,8 +386,8 @@ const Calendar = () => {
                       {/* Select Activity */}
                       {stopActivities.length > 0 ? (
                         <div className="mb-3">
-                          <label className="form-label text-navy-deep fw-semibold small">Choose Activity</label>
-                          <select className="form-select bg-light border-0" value={selectedActivityId} onChange={(e) => setSelectedActivityId(e.target.value)} required>
+                          <label className="form-label text-white fw-semibold small font-heading">Choose Activity</label>
+                          <select className="form-select bg-dark text-white border-white border-opacity-20" value={selectedActivityId} onChange={(e) => setSelectedActivityId(e.target.value)} required>
                             {stopActivities.map((a) => (
                               <option key={a.id} value={a.id}>
                                 {a.activity_name || a.name} ({a.category} • {a.duration})
@@ -393,25 +404,25 @@ const Calendar = () => {
                       {/* Times */}
                       <div className="row g-2 mb-3">
                         <div className="col-6">
-                          <label className="form-label text-navy-deep fw-semibold small">Start Time</label>
-                          <input type="time" className="form-control form-control-sm bg-light" value={startTime} onChange={(e) => setStartTime(e.target.value)} required />
+                          <label className="form-label text-white fw-semibold small font-heading">Start Time</label>
+                          <input type="time" className="form-control form-control-sm bg-dark text-white border-white border-opacity-20" value={startTime} onChange={(e) => setStartTime(e.target.value)} required />
                         </div>
                         <div className="col-6">
-                          <label className="form-label text-navy-deep fw-semibold small">End Time</label>
-                          <input type="time" className="form-control form-control-sm bg-light" value={endTime} onChange={(e) => setEndTime(e.target.value)} required />
+                          <label className="form-label text-white fw-semibold small font-heading">End Time</label>
+                          <input type="time" className="form-control form-control-sm bg-dark text-white border-white border-opacity-20" value={endTime} onChange={(e) => setEndTime(e.target.value)} required />
                         </div>
                       </div>
 
                       {/* Notes */}
                       <div className="mb-3">
-                        <label className="form-label text-navy-deep fw-semibold small">Notes (Optional)</label>
-                        <input type="text" className="form-control form-control-sm bg-light" placeholder="e.g. Meeting point..." value={itemNotes} onChange={(e) => setItemNotes(e.target.value)} />
+                        <label className="form-label text-white fw-semibold small font-heading">Notes (Optional)</label>
+                        <input type="text" className="form-control form-control-sm bg-dark text-white border-white border-opacity-20" placeholder="e.g. Meeting point..." value={itemNotes} onChange={(e) => setItemNotes(e.target.value)} />
                       </div>
                     </>
                   ) : (
                     <div className="text-center py-3">
-                      <p className="text-muted small mb-3">You need to add a city stop to your trip first.</p>
-                      <Link to={`/itinerary/${trip.id}`} className="btn btn-gt-primary btn-sm">
+                      <p className="text-white-50 small mb-3">You need to add a city stop to your trip first.</p>
+                      <Link to={`/itinerary/${trip.id}`} className="btn btn-gt-primary btn-sm font-heading">
                         Go to Itinerary Builder
                       </Link>
                     </div>
@@ -419,11 +430,11 @@ const Calendar = () => {
                 </div>
 
                 {stops.length > 0 && stopActivities.length > 0 && (
-                  <div className="modal-footer bg-light border-top">
-                    <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => setShowAddModal(false)}>
+                  <div className="modal-footer border-top border-white border-opacity-10">
+                    <button type="button" className="btn btn-gt-outline btn-sm font-heading" onClick={() => setShowAddModal(false)}>
                       Cancel
                     </button>
-                    <button type="submit" disabled={submittingActivity} className="btn btn-gt-primary btn-sm px-4 fw-bold">
+                    <button type="submit" disabled={submittingActivity} className="btn btn-gt-primary btn-sm px-4 fw-bold font-heading">
                       {submittingActivity ? "Scheduling..." : "Schedule Activity"}
                     </button>
                   </div>

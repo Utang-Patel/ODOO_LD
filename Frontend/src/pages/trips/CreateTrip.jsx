@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import PageHeader from "../../components/PageHeader";
 import tripService from "../../services/tripService";
+import cityService from "../../services/cityService";
 
 const PRESET_COVERS = [
   { name: "Paris & Europe", url: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80" },
@@ -25,11 +26,27 @@ const CreateTrip = () => {
     currency: "INR"
   });
 
+  const [popularCities, setPopularCities] = useState([]);
   const [customCoverUrl, setCustomCoverUrl] = useState("");
   const [useCustomUrl, setUseCustomUrl] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+
+  // Fetch real cities from MySQL database for destination tags
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const res = await cityService.getCities();
+        if (res.success && Array.isArray(res.cities)) {
+          setPopularCities(res.cities);
+        }
+      } catch (err) {
+        console.error("[Fetch Cities Error]:", err);
+      }
+    };
+    fetchCities();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -48,11 +65,19 @@ const CreateTrip = () => {
     }
   };
 
+  const handleSelectCityTag = (city) => {
+    const cityName = city.city_name || city.name;
+    setFormData((prev) => ({
+      ...prev,
+      trip_name: prev.trip_name ? prev.trip_name : `${cityName} Tour & Experience`,
+      cover_image: city.image || prev.cover_image
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    // Field Validation
     if (!formData.trip_name.trim()) {
       setError("Trip name is required.");
       return;
@@ -100,7 +125,11 @@ const CreateTrip = () => {
       setSuccessMessage(res.message || "Trip created successfully! ✈️");
 
       setTimeout(() => {
-        navigate("/my-trips");
+        if (res.trip?.id) {
+          navigate(`/itinerary/${res.trip.id}`);
+        } else {
+          navigate("/my-trips");
+        }
       }, 1200);
     } catch (err) {
       console.error("[Create Trip Error]:", err);
@@ -112,9 +141,9 @@ const CreateTrip = () => {
   };
 
   return (
-    <div>
+    <div className="d-flex flex-column gap-4 py-2">
       <PageHeader
-        title="Plan New Trip"
+        title="Plan New Trip ✈️"
         subtitle="Create your multi-city itinerary starting with basic trip dates & budget."
         breadcrumbs={[{ label: "My Trips", path: "/my-trips" }, { label: "Plan New Trip" }]}
       />
@@ -133,15 +162,15 @@ const CreateTrip = () => {
         </div>
       )}
 
-      <div className="row g-4">
+      <div className="row g-4 g-xl-5">
         {/* Left Column: Visual Cover Preview & Selection */}
         <div className="col-lg-5">
-          <div className="gt-card p-4 h-100 d-flex flex-column justify-content-between">
+          <div className="gt-glass-card p-4 p-md-5 h-100 d-flex flex-column justify-content-between">
             <div>
-              <h5 className="font-heading fw-bold text-navy-deep mb-3">Cover Image Preview</h5>
+              <h5 className="font-heading fw-bold text-white mb-3">Cover Image Preview</h5>
 
               {/* Cover Preview Card */}
-              <div className="position-relative rounded-4 overflow-hidden shadow-sm mb-4" style={{ height: "240px" }}>
+              <div className="position-relative rounded-4 overflow-hidden shadow-sm mb-4" style={{ height: "230px" }}>
                 <img
                   src={useCustomUrl && customCoverUrl ? customCoverUrl : formData.cover_image}
                   alt="Trip Cover Preview"
@@ -153,10 +182,10 @@ const CreateTrip = () => {
                 />
                 <div
                   className="position-absolute top-0 start-0 w-100 h-100"
-                  style={{ background: "linear-gradient(to bottom, transparent 40%, rgba(7,26,43,0.85))" }}
+                  style={{ background: "linear-gradient(to bottom, rgba(7,11,26,0.2), rgba(7,11,26,0.85))" }}
                 ></div>
                 <div className="position-absolute bottom-0 start-0 m-3 text-white">
-                  <span className="badge bg-sunset-gradient text-navy-deep fw-bold mb-1">Preview</span>
+                  <span className="badge bg-saas-gradient text-white fw-bold mb-1 font-heading">Preview</span>
                   <h5 className="font-heading fw-bold text-white mb-0">
                     {formData.trip_name.trim() || "Your Trip Name"}
                   </h5>
@@ -164,8 +193,8 @@ const CreateTrip = () => {
               </div>
 
               {/* Preset Selector */}
-              <label className="form-label text-navy-deep fw-semibold small mb-2">Select Preset Cover</label>
-              <div className="row g-2 mb-3">
+              <label className="form-label text-white fw-semibold small mb-2 font-heading">Select Preset Cover</label>
+              <div className="row g-2 mb-4">
                 {PRESET_COVERS.map((preset, idx) => (
                   <div key={idx} className="col-4">
                     <button
@@ -182,58 +211,85 @@ const CreateTrip = () => {
                 ))}
               </div>
 
-              {/* Custom Image URL Option */}
-              <div className="mt-3 pt-3 border-top">
-                <div className="form-check mb-2">
+              {/* Custom Image URL Option with Spacious Apply Button & Input */}
+              <div className="mt-4 pt-3 border-top border-white border-opacity-10 mb-4">
+                <div className="form-check mb-3 d-flex align-items-center gap-2.5">
                   <input
-                    className="form-check-input"
+                    className="form-check-input mt-0 me-2"
                     type="checkbox"
                     id="useCustomUrl"
                     checked={useCustomUrl}
                     onChange={(e) => setUseCustomUrl(e.target.checked)}
                   />
-                  <label className="form-check-label text-secondary small fw-semibold" htmlFor="useCustomUrl">
+                  <label className="form-check-label text-white-50 small fw-semibold font-heading ms-2" htmlFor="useCustomUrl">
                     Use Custom Image URL
                   </label>
                 </div>
 
                 {useCustomUrl && (
-                  <div className="input-group">
+                  <div className="d-flex align-items-center gap-3 mt-3 mb-2">
                     <input
                       type="url"
-                      className="form-control form-control-sm bg-light"
+                      className="form-control bg-dark text-white border-white border-opacity-20 rounded-3 flex-grow-1 px-3 py-2"
                       placeholder="https://example.com/cover.jpg"
                       value={customCoverUrl}
                       onChange={(e) => setCustomCoverUrl(e.target.value)}
                     />
-                    <button type="button" className="btn btn-gt-outline btn-sm" onClick={handleApplyCustomUrl}>
+                    <button
+                      type="button"
+                      className="btn btn-gt-primary px-4 py-2 fw-bold font-heading rounded-3 text-nowrap ms-1"
+                      onClick={handleApplyCustomUrl}
+                    >
                       Apply
                     </button>
                   </div>
                 )}
               </div>
+
+              {/* Real Database Destinations Section with Spacious City Name Chips */}
+              {popularCities.length > 0 && (
+                <div className="mt-4 pt-4 border-top border-white border-opacity-10">
+                  <span className="text-white-50 small fw-semibold d-block mb-3 font-heading">
+                    Popular Destinations in Database <span className="text-muted fs-8">(Click to select)</span>:
+                  </span>
+                  <div className="d-flex flex-wrap gap-3 font-heading">
+                    {popularCities.map((c) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => handleSelectCityTag(c)}
+                        className="btn btn-sm btn-dark bg-opacity-60 border border-white border-opacity-10 text-white rounded-pill px-3.5 py-2 fs-7 transition-all hover-border-primary me-1 mb-1 d-inline-flex align-items-center gap-2"
+                        title={`Click to fill trip cover with ${c.city_name || c.name}`}
+                      >
+                        <span className="text-saas-gradient fw-bold">📍 {c.city_name || c.name}</span>
+                        <span className="text-white-50 ms-1">({c.country})</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         {/* Right Column: Form */}
         <div className="col-lg-7">
-          <div className="gt-card p-4 p-md-5">
+          <div className="gt-glass-card p-4 p-md-5">
             <div className="mb-4">
-              <h3 className="font-heading fw-extrabold text-navy-deep mb-1">Create Your Adventure ✈️</h3>
-              <p className="text-muted small">Plan your next journey with GlobeTrotter.</p>
+              <h3 className="font-heading fw-extrabold text-white mb-1">Create Your Adventure ✈️</h3>
+              <p className="text-muted small font-heading">Plan your next journey with GlobeTrotter.</p>
             </div>
 
             <form onSubmit={handleSubmit} noValidate>
               {/* Trip Name */}
               <div className="mb-4">
-                <label className="form-label text-navy-deep fw-semibold">
+                <label className="form-label text-white fw-semibold font-heading mb-2">
                   Trip Name <span className="text-danger">*</span>
                 </label>
                 <input
                   type="text"
                   name="trip_name"
-                  className={`form-control form-control-lg bg-light border-0 shadow-none ${error && !formData.trip_name ? "is-invalid" : ""}`}
+                  className={`form-control form-control-lg bg-dark text-white border-white border-opacity-20 shadow-none ${error && !formData.trip_name ? "is-invalid" : ""}`}
                   placeholder="e.g. Europe Adventure, Tokyo Gateway..."
                   value={formData.trip_name}
                   onChange={handleChange}
@@ -242,28 +298,28 @@ const CreateTrip = () => {
               </div>
 
               {/* Date Inputs Row */}
-              <div className="row g-3 mb-4">
+              <div className="row g-3 g-md-4 mb-4">
                 <div className="col-md-6">
-                  <label className="form-label text-navy-deep fw-semibold">
+                  <label className="form-label text-white fw-semibold font-heading mb-2">
                     Start Date <span className="text-danger">*</span>
                   </label>
                   <input
                     type="date"
                     name="start_date"
-                    className="form-control form-control-lg bg-light border-0 shadow-none"
+                    className="form-control form-control-lg bg-dark text-white border-white border-opacity-20 shadow-none"
                     value={formData.start_date}
                     onChange={handleChange}
                     required
                   />
                 </div>
                 <div className="col-md-6">
-                  <label className="form-label text-navy-deep fw-semibold">
+                  <label className="form-label text-white fw-semibold font-heading mb-2">
                     End Date <span className="text-danger">*</span>
                   </label>
                   <input
                     type="date"
                     name="end_date"
-                    className="form-control form-control-lg bg-light border-0 shadow-none"
+                    className="form-control form-control-lg bg-dark text-white border-white border-opacity-20 shadow-none"
                     value={formData.end_date}
                     onChange={handleChange}
                     required
@@ -272,9 +328,9 @@ const CreateTrip = () => {
               </div>
 
               {/* Budget Limit & Currency Row */}
-              <div className="row g-3 mb-4">
+              <div className="row g-3 g-md-4 mb-4">
                 <div className="col-md-8">
-                  <label className="form-label text-navy-deep fw-semibold">
+                  <label className="form-label text-white fw-semibold font-heading mb-2">
                     Budget Limit <span className="text-muted small">(Optional)</span>
                   </label>
                   <input
@@ -282,17 +338,17 @@ const CreateTrip = () => {
                     step="0.01"
                     min="1"
                     name="budget_limit"
-                    className="form-control form-control-lg bg-light border-0 shadow-none"
+                    className="form-control form-control-lg bg-dark text-white border-white border-opacity-20 shadow-none"
                     placeholder="e.g. 100000"
                     value={formData.budget_limit}
                     onChange={handleChange}
                   />
                 </div>
                 <div className="col-md-4">
-                  <label className="form-label text-navy-deep fw-semibold">Currency</label>
+                  <label className="form-label text-white fw-semibold font-heading mb-2">Currency</label>
                   <select
                     name="currency"
-                    className="form-select form-select-lg bg-light border-0 shadow-none"
+                    className="form-select form-select-lg bg-dark text-white border-white border-opacity-20 shadow-none"
                     value={formData.currency}
                     onChange={handleChange}
                   >
@@ -306,13 +362,13 @@ const CreateTrip = () => {
 
               {/* Description */}
               <div className="mb-4">
-                <label className="form-label text-navy-deep fw-semibold">
+                <label className="form-label text-white fw-semibold font-heading mb-2">
                   Description <span className="text-muted small">(Optional)</span>
                 </label>
                 <textarea
                   name="description"
                   rows="3"
-                  className="form-control bg-light border-0 shadow-none"
+                  className="form-control bg-dark text-white border-white border-opacity-20 shadow-none"
                   placeholder="Summarize your travel plans, goals, or notes..."
                   value={formData.description}
                   onChange={handleChange}
@@ -320,8 +376,8 @@ const CreateTrip = () => {
               </div>
 
               {/* Actions */}
-              <div className="d-flex align-items-center justify-content-end gap-3 pt-3 border-top">
-                <Link to="/my-trips" className="btn btn-gt-outline px-4">
+              <div className="d-flex align-items-center justify-content-end gap-3 pt-4 border-top border-white border-opacity-10">
+                <Link to="/my-trips" className="btn btn-gt-outline px-4 py-2.5 font-heading">
                   Cancel
                 </Link>
                 <button

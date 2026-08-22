@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import logoPng from "../assets/logo.png";
 
 const MobileNavbar = ({ show, onHide }) => {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
 
   const navItems = [
@@ -12,7 +12,7 @@ const MobileNavbar = ({ show, onHide }) => {
     { label: "My Trips", path: "/my-trips", icon: "bi-airplane" },
     { label: "Plan New Trip", path: "/create-trip", icon: "bi-plus-circle" },
     { label: "Explore Cities", path: "/cities", icon: "bi-globe" },
-    { label: "Activities", path: "/activities/paris", icon: "bi-ticket-perforated" },
+    { label: "Activities", path: "/activities/1", icon: "bi-ticket-perforated" },
     { label: "Calendar", path: "/calendar/trip_1", icon: "bi-calendar" },
     { label: "Budget", path: "/budget/trip_1", icon: "bi-wallet2" },
     { label: "Shared Trip", path: "/shared/trip_1", icon: "bi-share" },
@@ -39,26 +39,27 @@ const MobileNavbar = ({ show, onHide }) => {
 
       {/* Offcanvas Drawer */}
       <div
-        className={`offcanvas offcanvas-start bg-navy-deep text-white d-lg-none ${
+        className={`offcanvas offcanvas-start bg-dark text-white d-lg-none ${
           show ? "show" : ""
         }`}
         tabIndex="-1"
         style={{
           visibility: show ? "visible" : "hidden",
           zIndex: 1050,
-          transition: "transform 0.3s ease-in-out"
+          transition: "transform 0.3s ease-in-out",
+          backgroundColor: "#0B1026"
         }}
       >
-        <div className="offcanvas-header border-bottom border-secondary border-opacity-25 px-4 py-3">
-          <div className="d-flex align-items-center gap-2">
+        <div className="offcanvas-header border-bottom border-white border-opacity-10 px-4 py-3">
+          <div className="d-flex align-items-center gap-3">
             <img
               src={logoPng}
               alt="GlobeTrotter Logo"
-              className="rounded-3 shadow-sm bg-white p-1"
+              className="rounded-3 shadow-sm bg-white p-1 me-2"
               style={{ width: "38px", height: "38px", objectFit: "contain" }}
             />
-            <h5 className="offcanvas-title font-heading fw-bold text-white mb-0">
-              Globe<span className="text-aqua">Trotter</span>
+            <h5 className="offcanvas-title font-heading fw-bold text-white mb-0 ms-1">
+              Globe<span className="text-saas-gradient">Trotter</span>
             </h5>
           </div>
           <button
@@ -70,30 +71,30 @@ const MobileNavbar = ({ show, onHide }) => {
         </div>
 
         <div className="offcanvas-body d-flex flex-column justify-content-between p-4">
-          <div className="nav flex-column gap-2">
+          <div className="nav flex-column gap-1">
             {navItems.map((item) => (
               <NavLink
                 key={item.path}
                 to={item.path}
                 onClick={onHide}
                 className={({ isActive }) =>
-                  `nav-link d-flex align-items-center gap-3 px-3 py-2.5 rounded-3 ${
+                  `nav-link d-flex align-items-center gap-3 px-3 py-2.5 rounded-3 font-heading ${
                     isActive
-                      ? "bg-ocean-gradient text-white fw-bold"
+                      ? "bg-saas-gradient text-white fw-bold shadow-lg"
                       : "text-white-50"
                   }`
                 }
               >
                 <i className={`bi ${item.icon} fs-5`}></i>
-                <span>{item.label}</span>
+                <span className="ms-1">{item.label}</span>
               </NavLink>
             ))}
           </div>
 
-          <div className="pt-4 border-top border-secondary border-opacity-25">
+          <div className="pt-4 border-top border-white border-opacity-10">
             <button
               onClick={handleLogout}
-              className="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2 rounded-3 py-2"
+              className="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2 rounded-3 py-2 font-heading fw-bold"
             >
               <i className="bi bi-box-arrow-right fs-5"></i>
               <span>Log Out</span>

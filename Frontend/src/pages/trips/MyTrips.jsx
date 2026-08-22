@@ -38,7 +38,7 @@ const MyTrips = () => {
       }
     } catch (err) {
       console.error("[Fetch Trips Error]:", err);
-      setError("Unable to load your trips.");
+      setError("Unable to load your trips from database.");
     } finally {
       setLoading(false);
     }
@@ -91,14 +91,14 @@ const MyTrips = () => {
   });
 
   return (
-    <div>
+    <div className="d-flex flex-column gap-4 py-2">
       <PageHeader
-        title="My Trips"
-        subtitle="All your adventures in one place."
+        title="My Trips ✈️"
+        subtitle="Real multi-city journeys and travel itineraries stored in your database."
         action={
-          <Link to="/create-trip" className="btn btn-gt-sunset font-heading fw-bold d-flex align-items-center gap-2">
+          <Link to="/create-trip" className="btn btn-gt-primary font-heading fw-bold d-flex align-items-center gap-2 px-4 py-2.5">
             <i className="bi bi-plus-circle-fill fs-5"></i>
-            <span>+ Plan New Trip</span>
+            <span>Plan New Trip</span>
           </Link>
         }
       />
@@ -112,15 +112,15 @@ const MyTrips = () => {
         </div>
       )}
 
-      {/* Filter & Search Toolbar */}
-      <div className="gt-card p-3 mb-4 d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3">
+      {/* Filter & Search Toolbar with Clean Spacing */}
+      <div className="gt-glass-card p-4 mb-4 d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-3">
         {/* Search Bar */}
-        <div className="position-relative flex-grow-1" style={{ maxWidth: "400px" }}>
+        <div className="position-relative flex-grow-1" style={{ maxWidth: "420px" }}>
           <i className="bi bi-search position-absolute text-muted ms-3 top-50 translate-middle-y"></i>
           <input
             type="text"
-            className="form-control rounded-pill ps-5 bg-light border-0 shadow-none"
-            placeholder="🔍 Search trips by name..."
+            className="form-control form-control-lg rounded-pill ps-5 bg-dark border-0 shadow-none text-white small"
+            placeholder="Search your trips by name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -129,21 +129,21 @@ const MyTrips = () => {
               onClick={() => setSearchTerm("")}
               className="btn btn-sm btn-link text-muted position-absolute end-0 top-50 translate-middle-y me-2 p-0 text-decoration-none"
             >
-              <i className="bi bi-x-circle-fill"></i>
+              <i className="bi bi-x-circle-fill fs-5"></i>
             </button>
           )}
         </div>
 
         {/* Status Filter Badges */}
-        <div className="d-flex align-items-center gap-1 overflow-auto py-1">
+        <div className="d-flex align-items-center gap-2 overflow-auto py-1 font-heading">
           {["All", "Upcoming", "Ongoing", "Completed"].map((status) => (
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className={`btn btn-sm rounded-pill px-3 py-1.5 fw-semibold text-nowrap transition-all ${
+              className={`btn btn-sm rounded-pill px-4 py-2 fw-semibold text-nowrap transition-all ${
                 statusFilter === status
-                  ? "bg-navy-deep text-aqua shadow-sm"
-                  : "btn-light border text-muted"
+                  ? "bg-saas-gradient text-white shadow-sm fw-bold"
+                  : "btn-gt-outline text-white-50"
               }`}
             >
               {status}
@@ -154,20 +154,20 @@ const MyTrips = () => {
 
       {/* Main Content States */}
       {loading ? (
-        <Loading message="Loading your adventures..." />
+        <Loading message="Fetching your real trips from database..." />
       ) : error ? (
-        <div className="gt-card p-5 text-center my-4">
+        <div className="gt-glass-card p-5 text-center my-4">
           <div className="d-flex align-items-center justify-content-center bg-danger bg-opacity-10 text-danger rounded-circle mx-auto mb-3" style={{ width: "64px", height: "64px" }}>
             <i className="bi bi-exclamation-triangle fs-2"></i>
           </div>
-          <h5 className="font-heading text-navy-deep fw-bold mb-2">{error}</h5>
-          <p className="text-muted small mb-4">Check your backend connection and try again.</p>
-          <button onClick={fetchTrips} className="btn btn-gt-primary px-4">
+          <h5 className="font-heading text-white fw-bold mb-2">{error}</h5>
+          <p className="text-white-50 small mb-4 font-heading">Check your backend connection and try again.</p>
+          <button onClick={fetchTrips} className="btn btn-gt-primary px-4 py-2 font-heading fw-bold">
             <i className="bi bi-arrow-clockwise me-1"></i> Try Again
           </button>
         </div>
       ) : filteredTrips.length > 0 ? (
-        <div className="row g-4">
+        <div className="row g-4 g-xl-5">
           {filteredTrips.map((trip) => (
             <div key={trip.id} className="col-md-6 col-lg-4">
               <TripCard
@@ -181,8 +181,8 @@ const MyTrips = () => {
       ) : (
         <EmptyState
           title={searchTerm || statusFilter !== "All" ? "No matching trips found" : "No trips planned yet ✈️"}
-          description={searchTerm || statusFilter !== "All" ? "Try adjusting your search query or status filter." : "Your next adventure is waiting."}
-          actionLabel="+ Plan New Trip"
+          description={searchTerm || statusFilter !== "All" ? "Try adjusting your search query or status filter." : "Your next adventure is waiting. Plan your first trip now."}
+          actionLabel="Plan New Trip"
           actionPath="/create-trip"
         />
       )}

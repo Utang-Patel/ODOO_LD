@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import PageHeader from "../../components/PageHeader";
 import ActivityCard from "../../components/ActivityCard";
 import Loading from "../../components/Loading";
@@ -12,6 +12,7 @@ import itineraryService from "../../services/itineraryService";
 
 const ActivitySearch = () => {
   const { cityId } = useParams();
+  const activeCityId = cityId || "1";
   const navigate = useNavigate();
 
   const [city, setCity] = useState(null);
@@ -37,17 +38,17 @@ const ActivitySearch = () => {
   const [modalError, setModalError] = useState("");
   const [toastMessage, setToastMessage] = useState("");
 
-  // Fetch City & Activities
+  // Fetch City & Activities from MySQL database
   useEffect(() => {
     const fetchCityData = async () => {
       try {
         setLoading(true);
-        const cityRes = await cityService.getCity(cityId);
+        const cityRes = await cityService.getCity(activeCityId);
         if (cityRes.success && cityRes.city) {
           setCity(cityRes.city);
         }
 
-        const actRes = await activityService.getCityActivities(cityId, selectedCategory);
+        const actRes = await activityService.getCityActivities(activeCityId, selectedCategory);
         if (actRes.success && Array.isArray(actRes.activities)) {
           setActivities(actRes.activities);
         }
@@ -59,7 +60,7 @@ const ActivitySearch = () => {
     };
 
     fetchCityData();
-  }, [cityId, selectedCategory]);
+  }, [activeCityId, selectedCategory]);
 
   // Open Add Activity Modal
   const handleOpenAddModal = async (act) => {
@@ -174,7 +175,7 @@ const ActivitySearch = () => {
   });
 
   return (
-    <div>
+    <div className="d-flex flex-column gap-4 py-2">
       <PageHeader
         title={`Things to Do in ${city?.city_name || city?.name || "Destination"}`}
         subtitle={`Browse top sightseeing, food, adventure, and cultural activities in ${city?.country || ""}.`}
@@ -187,7 +188,7 @@ const ActivitySearch = () => {
             <i className="bi bi-check-circle-fill fs-5"></i>
             <span>{toastMessage}</span>
           </div>
-          <button className="btn btn-sm btn-gt-outline" onClick={() => navigate(`/itinerary/${selectedTripId}`)}>
+          <button className="btn btn-sm btn-gt-outline font-heading" onClick={() => navigate(`/itinerary/${selectedTripId}`)}>
             View Itinerary
           </button>
         </div>
@@ -196,48 +197,65 @@ const ActivitySearch = () => {
       {/* City Hero Card */}
       {city && (
         <div
-          className="gt-card p-4 p-md-5 text-white mb-4 rounded-4 position-relative overflow-hidden shadow-lg border-0"
+          className="gt-glass-card p-4 p-md-5 text-white mb-4 rounded-4 position-relative overflow-hidden shadow-lg border-0"
           style={{
-            backgroundImage: `linear-gradient(to right, rgba(7,26,43,0.92), rgba(7,26,43,0.6)), url(${city.image})`,
+            backgroundImage: `linear-gradient(to right, rgba(7,11,26,0.92), rgba(7,11,26,0.6)), url(${city.image})`,
             backgroundSize: "cover",
             backgroundPosition: "center"
           }}
         >
           <div className="position-relative z-1">
             <div className="d-flex align-items-center gap-2 mb-2">
-              <span className="badge bg-white text-dark shadow-sm fs-6">{city.country_code || "WORLD"}</span>
-              <span className="badge bg-ocean-gradient text-white fw-bold">{city.region}</span>
-              <span className="badge bg-light text-navy-deep fw-bold">{city.cost_index}</span>
+              <span className="badge bg-saas-gradient text-white fw-bold font-heading">{city.region}</span>
+              <span className="badge bg-dark text-saas-gradient border border-primary fw-bold font-heading">{city.cost_index}</span>
             </div>
             <h1 className="font-heading display-5 fw-extrabold text-white mb-2">{city.city_name}, {city.country}</h1>
-            <p className="text-white-50 lead fs-6 mb-0 max-w-xl">{city.description}</p>
+            <p className="text-white-50 lead fs-6 mb-0 max-w-xl font-heading">{city.description}</p>
           </div>
         </div>
       )}
 
-      {/* Search & Category Filter Toolbar */}
-      <div className="gt-card p-3 p-md-4 mb-4">
-        <div className="row g-3 align-items-center">
-          <div className="col-md-5">
-            <div className="position-relative">
-              <i className="bi bi-search position-absolute text-muted ms-3 top-50 translate-middle-y"></i>
-              <input
-                type="text"
-                className="form-control rounded-pill ps-5 bg-light border-0 shadow-none"
-                placeholder="🔍 Search activities..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
+      {/* Prominent Full-Width Search & Filter Toolbar */}
+      <div className="gt-glass-card p-4 p-md-4.5 mb-5 shadow-lg border-0">
+        {/* Full Width Search Bar */}
+        <div className="position-relative mb-4">
+          <i className="bi bi-search position-absolute text-saas-gradient ms-4 top-50 translate-middle-y fs-5"></i>
+          <input
+            type="text"
+            className="form-control form-control-lg rounded-pill ps-5 pe-5 bg-dark border border-white border-opacity-15 text-white font-heading shadow-sm"
+            style={{ paddingLeft: "3.5rem", height: "54px", fontSize: "1rem" }}
+            placeholder={`Search activities in ${city?.city_name || "this city"} by name or keyword...`}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          {searchTerm ? (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="btn btn-sm btn-link text-muted position-absolute end-0 top-50 translate-middle-y me-4 p-0 text-decoration-none"
+              title="Clear Search"
+            >
+              <i className="bi bi-x-circle-fill fs-5 text-white-50"></i>
+            </button>
+          ) : (
+            <span className="position-absolute end-0 top-50 translate-middle-y me-4 badge bg-dark border border-white border-opacity-10 text-white-50 font-heading px-3 py-1.5 fs-7">
+              {filteredActivities.length} {filteredActivities.length === 1 ? "Activity" : "Activities"}
+            </span>
+          )}
+        </div>
 
-          <div className="col-md-7 d-flex align-items-center gap-1 overflow-auto py-1">
+        {/* Category Filter Pills (Aligned with Even Spacing) */}
+        <div className="d-flex align-items-center flex-wrap gap-3.5 pt-3 border-top border-white border-opacity-10">
+          <span className="text-white-50 small font-heading fw-semibold me-1">
+            <i className="bi bi-funnel-fill me-1.5 text-saas-gradient"></i> Filter Category:
+          </span>
+
+          <div className="d-flex align-items-center gap-3 flex-wrap font-heading">
             {["All", "Sightseeing", "Food", "Adventure", "Culture", "Shopping", "Nature"].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`btn btn-sm rounded-pill px-3 py-1.5 text-nowrap transition-all ${
-                  selectedCategory === cat ? "bg-navy-deep text-aqua fw-bold shadow-sm" : "btn-light border text-muted"
+                className={`btn btn-sm rounded-pill px-4 py-2 text-nowrap transition-all ${
+                  selectedCategory === cat ? "bg-saas-gradient text-white fw-bold shadow-sm" : "btn-gt-outline text-white-50"
                 }`}
               >
                 {cat === "All" ? "All Categories" : cat}
@@ -249,9 +267,9 @@ const ActivitySearch = () => {
 
       {/* Activity Grid */}
       {loading ? (
-        <Loading message="Loading city activities..." />
+        <Loading message="Loading city activities from database..." />
       ) : filteredActivities.length > 0 ? (
-        <div className="row g-4">
+        <div className="row g-4 g-xl-5">
           {filteredActivities.map((act) => (
             <div key={act.id} className="col-md-6 col-lg-4">
               <ActivityCard
@@ -271,10 +289,10 @@ const ActivitySearch = () => {
 
       {/* Quick View Details Modal */}
       {quickViewActivity && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 1050 }}>
+        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(7,11,26,0.85)", zIndex: 1050 }}>
           <div className="modal-dialog modal-dialog-centered modal-lg">
-            <div className="modal-content gt-card border-0 shadow-lg overflow-hidden">
-              <div className="position-relative" style={{ height: "240px" }}>
+            <div className="modal-content gt-glass-card border border-white border-opacity-20 shadow-lg overflow-hidden">
+              <div className="position-relative" style={{ height: "250px" }}>
                 <img
                   src={quickViewActivity.image}
                   alt={quickViewActivity.activity_name || quickViewActivity.name}
@@ -288,31 +306,31 @@ const ActivitySearch = () => {
                 ></button>
                 <div
                   className="position-absolute top-0 start-0 w-100 h-100"
-                  style={{ background: "linear-gradient(to bottom, transparent 30%, rgba(7,26,43,0.9))" }}
+                  style={{ background: "linear-gradient(to bottom, rgba(7,11,26,0.2), rgba(7,11,26,0.9))" }}
                 ></div>
                 <div className="position-absolute bottom-0 start-0 m-4 text-white">
-                  <span className="badge bg-ocean-gradient text-white fw-bold mb-2">{quickViewActivity.category}</span>
+                  <span className="badge bg-saas-gradient text-white fw-bold mb-2 font-heading">{quickViewActivity.category}</span>
                   <h3 className="font-heading fw-extrabold text-white mb-0">{quickViewActivity.activity_name || quickViewActivity.name}</h3>
                 </div>
               </div>
 
               <div className="modal-body p-4">
-                <p className="text-secondary lead fs-6 mb-4">{quickViewActivity.description}</p>
+                <p className="text-white-50 lead fs-6 mb-4 font-heading">{quickViewActivity.description}</p>
 
-                <div className="row g-3 p-3 bg-light rounded-4 border mb-4">
-                  <div className="col-4 text-center border-end">
-                    <span className="text-muted fs-7 d-block">Duration</span>
-                    <span className="fw-bold text-navy-deep">{quickViewActivity.duration || "2 hours"}</span>
+                <div className="row g-3 p-3 bg-dark rounded-4 border border-white border-opacity-10 mb-4">
+                  <div className="col-4 text-center border-end border-white border-opacity-10">
+                    <span className="text-white-50 fs-7 d-block font-heading">Duration</span>
+                    <span className="fw-bold text-white font-heading">{quickViewActivity.duration || "2 hours"}</span>
                   </div>
-                  <div className="col-4 text-center border-end">
-                    <span className="text-muted fs-7 d-block">Cost</span>
-                    <span className="fw-bold text-navy-deep">
+                  <div className="col-4 text-center border-end border-white border-opacity-10">
+                    <span className="text-white-50 fs-7 d-block font-heading">Cost</span>
+                    <span className="fw-bold text-white font-heading">
                       {parseFloat(quickViewActivity.cost || 0) > 0 ? `€${quickViewActivity.cost}` : "Free"}
                     </span>
                   </div>
                   <div className="col-4 text-center">
-                    <span className="text-muted fs-7 d-block">Rating</span>
-                    <span className="fw-bold text-warning">
+                    <span className="text-white-50 fs-7 d-block font-heading">Rating</span>
+                    <span className="fw-bold text-warning font-heading">
                       <i className="bi bi-star-fill me-1"></i>
                       {quickViewActivity.rating || "4.8"}
                     </span>
@@ -320,16 +338,16 @@ const ActivitySearch = () => {
                 </div>
               </div>
 
-              <div className="modal-footer bg-light border-top">
-                <button type="button" className="btn btn-outline-secondary" onClick={() => setQuickViewActivity(null)}>
+              <div className="modal-footer border-top border-white border-opacity-10">
+                <button type="button" className="btn btn-gt-outline font-heading" onClick={() => setQuickViewActivity(null)}>
                   Close
                 </button>
                 <button
                   type="button"
-                  className="btn btn-gt-primary px-4 fw-bold"
+                  className="btn btn-gt-primary px-4 fw-bold font-heading"
                   onClick={() => handleOpenAddModal(quickViewActivity)}
                 >
-                  + Add to Trip
+                  Add to Trip
                 </button>
               </div>
             </div>
@@ -339,12 +357,12 @@ const ActivitySearch = () => {
 
       {/* Add Activity to Trip Modal */}
       {selectedActivityToAdd && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 1050 }}>
+        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(7,11,26,0.85)", zIndex: 1050 }}>
           <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content gt-card border-0 shadow-lg overflow-hidden">
-              <div className="modal-header bg-navy-deep text-white">
+            <div className="modal-content gt-glass-card border border-white border-opacity-20 shadow-lg overflow-hidden">
+              <div className="modal-header border-bottom border-white border-opacity-10 text-white">
                 <h5 className="modal-title font-heading fw-bold d-flex align-items-center gap-2">
-                  <i className="bi bi-plus-circle text-aqua"></i>
+                  <i className="bi bi-plus-circle text-saas-gradient"></i>
                   Add Activity to Trip
                 </h5>
                 <button type="button" className="btn-close btn-close-white" onClick={() => setSelectedActivityToAdd(null)}></button>
@@ -352,9 +370,9 @@ const ActivitySearch = () => {
 
               <form onSubmit={handleAddItinerarySubmit}>
                 <div className="modal-body p-4">
-                  <div className="p-3 bg-light rounded-3 mb-3 border">
-                    <h6 className="fw-bold text-navy-deep mb-1">{selectedActivityToAdd.activity_name || selectedActivityToAdd.name}</h6>
-                    <span className="text-muted small">{selectedActivityToAdd.category} • {selectedActivityToAdd.duration || "2 hours"}</span>
+                  <div className="p-3 bg-dark rounded-3 mb-3 border border-white border-opacity-10">
+                    <h6 className="fw-bold text-white font-heading mb-1">{selectedActivityToAdd.activity_name || selectedActivityToAdd.name}</h6>
+                    <span className="text-white-50 small font-heading">{selectedActivityToAdd.category} • {selectedActivityToAdd.duration || "2 hours"}</span>
                   </div>
 
                   {modalError && (
@@ -368,8 +386,8 @@ const ActivitySearch = () => {
                     <>
                       {/* Select Trip */}
                       <div className="mb-3">
-                        <label className="form-label text-navy-deep fw-semibold small">Choose Trip</label>
-                        <select className="form-select bg-light border-0" value={selectedTripId} onChange={handleTripChange}>
+                        <label className="form-label text-white fw-semibold small font-heading">Choose Trip</label>
+                        <select className="form-select bg-dark text-white border-white border-opacity-20" value={selectedTripId} onChange={handleTripChange}>
                           {userTrips.map((t) => (
                             <option key={t.id} value={t.id}>
                               {t.trip_name || t.name} ({t.start_date} – {t.end_date})
@@ -381,8 +399,8 @@ const ActivitySearch = () => {
                       {/* Select Stop */}
                       {tripStops.length > 0 ? (
                         <div className="mb-3">
-                          <label className="form-label text-navy-deep fw-semibold small">Choose City Stop</label>
-                          <select className="form-select bg-light border-0" value={selectedStopId} onChange={handleStopChange}>
+                          <label className="form-label text-white fw-semibold small font-heading">Choose City Stop</label>
+                          <select className="form-select bg-dark text-white border-white border-opacity-20" value={selectedStopId} onChange={handleStopChange}>
                             {tripStops.map((s) => (
                               <option key={s.id} value={s.id}>
                                 {s.city?.city_name || s.cityName || "Stop"} ({s.arrival_date} – {s.departure_date})
@@ -401,10 +419,10 @@ const ActivitySearch = () => {
                       {tripStops.length > 0 && (
                         <>
                           <div className="mb-3">
-                            <label className="form-label text-navy-deep fw-semibold small">Activity Date</label>
+                            <label className="form-label text-white fw-semibold small font-heading">Activity Date</label>
                             <input
                               type="date"
-                              className="form-control form-control-sm bg-light"
+                              className="form-control form-control-sm bg-dark text-white border-white border-opacity-20"
                               value={itemDate}
                               onChange={(e) => setItemDate(e.target.value)}
                               required
@@ -413,20 +431,20 @@ const ActivitySearch = () => {
 
                           <div className="row g-2 mb-3">
                             <div className="col-6">
-                              <label className="form-label text-navy-deep fw-semibold small">Start Time</label>
+                              <label className="form-label text-white fw-semibold small font-heading">Start Time</label>
                               <input
                                 type="time"
-                                className="form-control form-control-sm bg-light"
+                                className="form-control form-control-sm bg-dark text-white border-white border-opacity-20"
                                 value={startTime}
                                 onChange={(e) => setStartTime(e.target.value)}
                                 required
                               />
                             </div>
                             <div className="col-6">
-                              <label className="form-label text-navy-deep fw-semibold small">End Time</label>
+                              <label className="form-label text-white fw-semibold small font-heading">End Time</label>
                               <input
                                 type="time"
-                                className="form-control form-control-sm bg-light"
+                                className="form-control form-control-sm bg-dark text-white border-white border-opacity-20"
                                 value={endTime}
                                 onChange={(e) => setEndTime(e.target.value)}
                                 required
@@ -438,27 +456,27 @@ const ActivitySearch = () => {
                     </>
                   ) : (
                     <div className="text-center py-3">
-                      <p className="text-muted small mb-3">You don't have any trips created yet.</p>
+                      <p className="text-white-50 small mb-3 font-heading">You don't have any trips created yet.</p>
                       <button
                         type="button"
-                        className="btn btn-gt-primary btn-sm"
+                        className="btn btn-gt-primary btn-sm px-4 fw-bold font-heading"
                         onClick={() => {
                           setSelectedActivityToAdd(null);
                           navigate("/create-trip");
                         }}
                       >
-                        + Create a Trip First
+                        Create Trip First
                       </button>
                     </div>
                   )}
                 </div>
 
                 {userTrips.length > 0 && tripStops.length > 0 && (
-                  <div className="modal-footer bg-light border-top">
-                    <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => setSelectedActivityToAdd(null)}>
+                  <div className="modal-footer border-top border-white border-opacity-10">
+                    <button type="button" className="btn btn-gt-outline btn-sm font-heading" onClick={() => setSelectedActivityToAdd(null)}>
                       Cancel
                     </button>
-                    <button type="submit" disabled={submittingItem} className="btn btn-gt-primary btn-sm px-4 fw-bold">
+                    <button type="submit" disabled={submittingItem} className="btn btn-gt-primary btn-sm px-4 fw-bold font-heading">
                       {submittingItem ? "Adding Activity..." : "Add to Itinerary"}
                     </button>
                   </div>

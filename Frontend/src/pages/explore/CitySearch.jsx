@@ -44,7 +44,7 @@ const CitySearch = () => {
     fetchSaved();
   }, []);
 
-  // Fetch Cities with debounced search
+  // Fetch Cities from MySQL database with debounced search
   useEffect(() => {
     const handler = setTimeout(async () => {
       try {
@@ -128,7 +128,7 @@ const CitySearch = () => {
     }
   };
 
-  // Submit Add Stop
+  // Submit Add Stop to Trip in MySQL
   const handleAddStopSubmit = async (e) => {
     e.preventDefault();
     setModalError("");
@@ -171,10 +171,10 @@ const CitySearch = () => {
   };
 
   return (
-    <div>
+    <div className="d-flex flex-column gap-4 py-2">
       <PageHeader
-        title="Explore the World 🌎"
-        subtitle="Discover destinations, filter by cost index, save favorites, and add cities to your trip itineraries."
+        title="Explore Destinations 🌎"
+        subtitle="Discover destinations from your database, filter by cost index, save favorites, and add cities to your trip itineraries."
       />
 
       {toastMessage && (
@@ -183,37 +183,53 @@ const CitySearch = () => {
             <i className="bi bi-check-circle-fill fs-5"></i>
             <span>{toastMessage}</span>
           </div>
-          <button className="btn btn-sm btn-gt-outline" onClick={() => navigate(`/itinerary/${selectedTripId}`)}>
+          <button className="btn btn-sm btn-gt-outline font-heading" onClick={() => navigate(`/itinerary/${selectedTripId}`)}>
             View Itinerary
           </button>
         </div>
       )}
 
-      {/* Filter & Search Bar Toolbar */}
-      <div className="gt-card p-3 p-md-4 mb-4">
-        <div className="row g-3 align-items-center">
-          {/* Search Input */}
-          <div className="col-md-6">
-            <div className="position-relative">
-              <i className="bi bi-search position-absolute text-muted ms-3 top-50 translate-middle-y"></i>
-              <input
-                type="text"
-                className="form-control form-control-lg rounded-pill ps-5 bg-light border-0 shadow-none"
-                placeholder="🔍 Search cities by name or country..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
+      {/* Prominent Full-Width Search & Filter Toolbar */}
+      <div className="gt-glass-card p-4 p-md-4.5 mb-5 shadow-lg border-0">
+        {/* Full Width Search Input */}
+        <div className="position-relative mb-4">
+          <i className="bi bi-search position-absolute text-saas-gradient ms-4 top-50 translate-middle-y fs-5"></i>
+          <input
+            type="text"
+            className="form-control form-control-lg rounded-pill ps-5 pe-5 bg-dark border border-white border-opacity-15 text-white font-heading shadow-sm"
+            style={{ paddingLeft: "3.5rem", height: "54px", fontSize: "1rem" }}
+            placeholder="Search cities by name or country..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          {searchTerm ? (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="btn btn-sm btn-link text-muted position-absolute end-0 top-50 translate-middle-y me-4 p-0 text-decoration-none"
+              title="Clear Search"
+            >
+              <i className="bi bi-x-circle-fill fs-5 text-white-50"></i>
+            </button>
+          ) : (
+            <span className="position-absolute end-0 top-50 translate-middle-y me-4 badge bg-dark border border-white border-opacity-10 text-white-50 font-heading px-3 py-1.5 fs-7">
+              {cities.length} {cities.length === 1 ? "City" : "Cities"}
+            </span>
+          )}
+        </div>
 
-          {/* Region Chips */}
-          <div className="col-md-6 d-flex align-items-center gap-1 overflow-auto py-1">
+        {/* Region Chips line (Even Spacing Alignment) */}
+        <div className="d-flex align-items-center flex-wrap gap-3.5 pt-3 border-top border-white border-opacity-10">
+          <span className="text-white-50 small font-heading fw-semibold me-1">
+            <i className="bi bi-funnel-fill me-1.5 text-saas-gradient"></i> Filter Region:
+          </span>
+
+          <div className="d-flex align-items-center gap-3 flex-wrap font-heading">
             {["All", "Europe", "Asia", "Middle East", "North America", "Oceania"].map((r) => (
               <button
                 key={r}
                 onClick={() => setSelectedRegion(r)}
-                className={`btn btn-sm rounded-pill px-3 py-1.5 text-nowrap transition-all ${
-                  selectedRegion === r ? "bg-ocean-gradient text-white fw-bold shadow-sm" : "btn-light border text-muted"
+                className={`btn btn-sm rounded-pill px-4 py-2 text-nowrap transition-all ${
+                  selectedRegion === r ? "bg-saas-gradient text-white fw-bold shadow-sm" : "btn-gt-outline text-white-50"
                 }`}
               >
                 {r === "All" ? "All Regions" : r}
@@ -223,11 +239,11 @@ const CitySearch = () => {
         </div>
       </div>
 
-      {/* Cities Grid */}
+      {/* Cities Grid with Spacious Layout */}
       {loading ? (
-        <Loading message="Loading global destinations..." />
+        <Loading message="Loading global destinations from database..." />
       ) : cities.length > 0 ? (
-        <div className="row g-4">
+        <div className="row g-4 g-xl-5">
           {cities.map((city) => (
             <div key={city.id} className="col-md-6 col-lg-4">
               <DestinationCard
@@ -248,12 +264,12 @@ const CitySearch = () => {
 
       {/* Add City Stop Modal */}
       {selectedCityForStop && (
-        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 1050 }}>
+        <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(7,11,26,0.85)", zIndex: 1050 }}>
           <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content gt-card border-0 shadow-lg overflow-hidden">
-              <div className="modal-header bg-navy-deep text-white">
+            <div className="modal-content gt-glass-card border border-white border-opacity-20 shadow-lg overflow-hidden">
+              <div className="modal-header border-bottom border-white border-opacity-10 text-white">
                 <h5 className="modal-title font-heading fw-bold d-flex align-items-center gap-2">
-                  <i className="bi bi-geo-alt text-aqua"></i>
+                  <i className="bi bi-geo-alt text-saas-gradient"></i>
                   Add {selectedCityForStop.city_name || selectedCityForStop.name} to Trip
                 </h5>
                 <button type="button" className="btn-close btn-close-white" onClick={() => setSelectedCityForStop(null)}></button>
@@ -272,8 +288,8 @@ const CitySearch = () => {
                     <>
                       {/* Select Trip */}
                       <div className="mb-3">
-                        <label className="form-label text-navy-deep fw-semibold">Choose Trip</label>
-                        <select className="form-select bg-light border-0" value={selectedTripId} onChange={handleTripChange}>
+                        <label className="form-label text-white fw-semibold font-heading">Choose Trip</label>
+                        <select className="form-select bg-dark text-white border-white border-opacity-20" value={selectedTripId} onChange={handleTripChange}>
                           {userTrips.map((t) => (
                             <option key={t.id} value={t.id}>
                               {t.trip_name || t.name} ({t.start_date} – {t.end_date})
@@ -285,20 +301,20 @@ const CitySearch = () => {
                       {/* Dates */}
                       <div className="row g-3">
                         <div className="col-6">
-                          <label className="form-label text-navy-deep fw-semibold small">Arrival Date</label>
+                          <label className="form-label text-white fw-semibold small font-heading">Arrival Date</label>
                           <input
                             type="date"
-                            className="form-control form-control-sm bg-light"
+                            className="form-control form-control-sm bg-dark text-white border-white border-opacity-20"
                             value={arrivalDate}
                             onChange={(e) => setArrivalDate(e.target.value)}
                             required
                           />
                         </div>
                         <div className="col-6">
-                          <label className="form-label text-navy-deep fw-semibold small">Departure Date</label>
+                          <label className="form-label text-white fw-semibold small font-heading">Departure Date</label>
                           <input
                             type="date"
-                            className="form-control form-control-sm bg-light"
+                            className="form-control form-control-sm bg-dark text-white border-white border-opacity-20"
                             value={departureDate}
                             onChange={(e) => setDepartureDate(e.target.value)}
                             required
@@ -308,27 +324,27 @@ const CitySearch = () => {
                     </>
                   ) : (
                     <div className="text-center py-3">
-                      <p className="text-muted small mb-3">You don't have any trips created yet.</p>
+                      <p className="text-white-50 small mb-3 font-heading">You don't have any trips created yet.</p>
                       <button
                         type="button"
-                        className="btn btn-gt-primary btn-sm"
+                        className="btn btn-gt-primary btn-sm px-4 fw-bold font-heading"
                         onClick={() => {
                           setSelectedCityForStop(null);
                           navigate("/create-trip");
                         }}
                       >
-                        + Create a Trip First
+                        Create Trip First
                       </button>
                     </div>
                   )}
                 </div>
 
                 {userTrips.length > 0 && (
-                  <div className="modal-footer bg-light border-top">
-                    <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => setSelectedCityForStop(null)}>
+                  <div className="modal-footer border-top border-white border-opacity-10">
+                    <button type="button" className="btn btn-gt-outline btn-sm font-heading" onClick={() => setSelectedCityForStop(null)}>
                       Cancel
                     </button>
-                    <button type="submit" disabled={stopSubmitting} className="btn btn-gt-primary btn-sm px-4 fw-bold">
+                    <button type="submit" disabled={stopSubmitting} className="btn btn-gt-primary btn-sm px-4 fw-bold font-heading">
                       {stopSubmitting ? "Adding Stop..." : "Add City Stop"}
                     </button>
                   </div>
