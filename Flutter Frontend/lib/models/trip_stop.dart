@@ -40,17 +40,17 @@ class TripStop {
 
   factory TripStop.fromJson(Map<String, dynamic> json) {
     return TripStop(
-      id: json['id'] as String? ?? '',
-      city: City.fromJson(json['city'] as Map<String, dynamic>? ?? {}),
-      arrivalDate: DateTime.tryParse(json['arrivalDate'] as String? ?? '') ?? DateTime.now(),
-      departureDate: DateTime.tryParse(json['departureDate'] as String? ?? '') ?? DateTime.now(),
-      activities: (json['activities'] as List<dynamic>?)
+      id: (json['id'] ?? '').toString(),
+      city: City.fromJson((json['City'] ?? json['city'] ?? {}) as Map<String, dynamic>),
+      arrivalDate: DateTime.tryParse(json['arrival_date'] as String? ?? json['arrivalDate'] as String? ?? '') ?? DateTime.now(),
+      departureDate: DateTime.tryParse(json['departure_date'] as String? ?? json['departureDate'] as String? ?? '') ?? DateTime.now(),
+      activities: (json['Activities'] as List<dynamic>? ?? json['activities'] as List<dynamic>?)
               ?.map((e) => Activity.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
       budget: (json['budget'] as num?)?.toDouble() ?? 0.0,
-      hotelName: json['hotelName'] as String? ?? '',
-      transportMode: json['transportMode'] as String? ?? 'Flight',
+      hotelName: json['hotel_name'] as String? ?? json['hotelName'] as String? ?? '',
+      transportMode: json['transport_mode'] as String? ?? json['transportMode'] as String? ?? 'Flight',
     );
   }
 }

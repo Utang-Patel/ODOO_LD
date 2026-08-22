@@ -3,6 +3,8 @@ import '../data/dummy_data.dart';
 import '../models/activity.dart';
 import '../models/city.dart';
 import '../models/trip.dart';
+import '../providers/auth_provider.dart';
+import '../services/api_service.dart';
 
 /// State for trips and travel exploration
 class TripState {
@@ -91,7 +93,9 @@ class TripState {
 
 /// State notifier managing trips and exploration
 class TripNotifier extends StateNotifier<TripState> {
-  TripNotifier()
+  final ApiService _apiService;
+
+  TripNotifier(this._apiService)
       : super(
           TripState(
             trips: DummyData.dummyTrips,
@@ -99,7 +103,39 @@ class TripNotifier extends StateNotifier<TripState> {
             activities: DummyData.dummyActivities,
             selectedTripId: DummyData.dummyTrips.first.id,
           ),
+        ) {
+    _loadFromBackend();
+  }
+
+  /// Load cities and trips from the backend, fall back to dummy data on failure
+  Future<void> _loadFromBackend() async {
+    state = state.copyWith(isLoading: true);
+    try {
+      final cities = await _apiService.getCities();
+      if (cities.isNotEmpty) {
+        state = state.copyWith(cities: cities);
+      }
+    } catch (_) {
+      // Keep dummy cities on error
+    }
+
+    try {
+      final trips = await _apiService.getTrips();
+      if (trips.isNotEmpty) {
+        state = state.copyWith(
+          trips: trips,
+          selectedTripId: trips.first.id,
         );
+      }
+    } catch (_) {
+      // Keep dummy trips on error
+    }
+
+    state = state.copyWith(isLoading: false);
+  }
+
+  /// Refresh data from backend (call after login)
+  Future<void> refresh() => _loadFromBackend();
 
   void selectTrip(String tripId) {
     state = state.copyWith(selectedTripId: tripId);
@@ -140,7 +176,8 @@ class TripNotifier extends StateNotifier<TripState> {
   }
 }
 
-/// Global Trip Provider
+/// Global Trip Provider — uses the shared ApiService instance
 final tripProvider = StateNotifierProvider<TripNotifier, TripState>((ref) {
-  return TripNotifier();
+  final api = ref.watch(apiServiceProvider);
+  return TripNotifier(api);
 });

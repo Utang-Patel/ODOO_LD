@@ -47,18 +47,19 @@ class City {
 
   factory City.fromJson(Map<String, dynamic> json) {
     return City(
-      id: json['id'] as String? ?? '',
+      id: (json['id'] ?? '').toString(),
       name: json['name'] as String? ?? '',
       country: json['country'] as String? ?? '',
-      imageUrl: json['imageUrl'] as String? ?? '',
+      imageUrl: json['image_url'] as String? ?? json['imageUrl'] as String? ?? '',
       rating: (json['rating'] as num?)?.toDouble() ?? 4.5,
       description: json['description'] as String? ?? '',
       tag: json['tag'] as String? ?? 'Popular',
-      avgCostPerDay: (json['avgCostPerDay'] as num?)?.toDouble() ?? 100.0,
+      avgCostPerDay: (json['avg_cost_per_day'] as num?)?.toDouble()
+          ?? (json['avgCostPerDay'] as num?)?.toDouble() ?? 100.0,
       currency: json['currency'] as String? ?? 'USD',
       latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,
       longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
-      isTrending: json['isTrending'] as bool? ?? false,
+      isTrending: json['is_trending'] as bool? ?? json['isTrending'] as bool? ?? false,
     );
   }
 }

@@ -114,34 +114,34 @@ class Trip {
 
   factory Trip.fromJson(Map<String, dynamic> json) {
     return Trip(
-      id: json['id'] as String? ?? '',
+      id: (json['id'] ?? '').toString(),
       title: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
-      coverImageUrl: json['coverImageUrl'] as String? ?? '',
-      startDate: DateTime.tryParse(json['startDate'] as String? ?? '') ?? DateTime.now(),
-      endDate: DateTime.tryParse(json['endDate'] as String? ?? '') ?? DateTime.now(),
+      coverImageUrl: json['cover_image_url'] as String? ?? json['coverImageUrl'] as String? ?? '',
+      startDate: DateTime.tryParse(json['start_date'] as String? ?? json['startDate'] as String? ?? '') ?? DateTime.now(),
+      endDate: DateTime.tryParse(json['end_date'] as String? ?? json['endDate'] as String? ?? '') ?? DateTime.now(),
       budget: (json['budget'] as num?)?.toDouble() ?? 0.0,
       spent: (json['spent'] as num?)?.toDouble() ?? 0.0,
       currency: json['currency'] as String? ?? 'USD',
       status: TripStatus.values.firstWhere(
-        (e) => e.name == json['status'],
+        (e) => e.name.toLowerCase() == (json['status'] as String? ?? '').toLowerCase(),
         orElse: () => TripStatus.upcoming,
       ),
-      stops: (json['stops'] as List<dynamic>?)
+      stops: (json['TripStops'] as List<dynamic>? ?? json['stops'] as List<dynamic>?)
               ?.map((e) => TripStop.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
-      itineraryItems: (json['itineraryItems'] as List<dynamic>?)
+      itineraryItems: (json['ItineraryItems'] as List<dynamic>? ?? json['itineraryItems'] as List<dynamic>? ?? json['itinerary_items'] as List<dynamic>?)
               ?.map((e) => ItineraryItem.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
-      expenses: (json['expenses'] as List<dynamic>?)
+      expenses: (json['Expenses'] as List<dynamic>? ?? json['expenses'] as List<dynamic>?)
               ?.map((e) => Expense.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
-      isPublic: json['isPublic'] as bool? ?? false,
-      createdBy: json['createdBy'] as String? ?? '',
-      travelersCount: (json['travelersCount'] as num?)?.toInt() ?? 1,
+      isPublic: json['is_public'] as bool? ?? json['isPublic'] as bool? ?? false,
+      createdBy: json['createdBy'] as String? ?? json['User']?['name'] as String? ?? 'Alex Morgan',
+      travelersCount: (json['travelers_count'] as num?)?.toInt() ?? (json['travelersCount'] as num?)?.toInt() ?? 1,
     );
   }
 }

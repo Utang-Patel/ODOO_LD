@@ -8,10 +8,11 @@ class AppConstants {
   static const String keySavedTripIds = 'gt_saved_trip_ids';
   static const String keyThemeMode = 'gt_theme_mode';
 
-  // API Config
-  static const String defaultApiBaseUrl = 'http://localhost:5000/api';
-  static const int apiConnectTimeout = 10000;
-  static const int apiReceiveTimeout = 10000;
+  // API Config — uses WiFi IP so physical Android devices can reach the backend
+  // PC WiFi IP: 10.166.69.146  |  Backend port: 5000
+  static const String defaultApiBaseUrl = 'http://10.166.69.146:5000/api';
+  static const int apiConnectTimeout = 15000;
+  static const int apiReceiveTimeout = 15000;
 
   // Responsive Breakpoints
   static const double breakpointMobileSmall = 360.0;

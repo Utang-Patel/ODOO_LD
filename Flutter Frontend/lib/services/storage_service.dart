@@ -21,6 +21,19 @@ class StorageService {
     return await _prefs.setBool(AppConstants.keyIsLoggedIn, value);
   }
 
+  // JWT Token
+  static const String _keyToken = 'gt_jwt_token';
+
+  String? getToken() => _prefs.getString(_keyToken);
+
+  Future<bool> saveToken(String token) async {
+    return await _prefs.setString(_keyToken, token);
+  }
+
+  Future<void> clearToken() async {
+    await _prefs.remove(_keyToken);
+  }
+
   // User Profile
   User? getUser() {
     final jsonStr = _prefs.getString(AppConstants.keyUserData);
@@ -41,6 +54,7 @@ class StorageService {
   Future<bool> clearSession() async {
     await _prefs.remove(AppConstants.keyIsLoggedIn);
     await _prefs.remove(AppConstants.keyUserData);
+    await clearToken();
     return true;
   }
 

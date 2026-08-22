@@ -47,18 +47,19 @@ class Activity {
 
   factory Activity.fromJson(Map<String, dynamic> json) {
     return Activity(
-      id: json['id'] as String? ?? '',
-      cityId: json['cityId'] as String? ?? '',
+      id: (json['id'] ?? '').toString(),
+      cityId: (json['city_id'] ?? json['cityId'] ?? '').toString(),
       name: json['name'] as String? ?? '',
       category: json['category'] as String? ?? 'General',
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
       duration: json['duration'] as String? ?? '2 hours',
       rating: (json['rating'] as num?)?.toDouble() ?? 4.5,
-      reviewsCount: (json['reviewsCount'] as num?)?.toInt() ?? 0,
-      imageUrl: json['imageUrl'] as String? ?? '',
+      reviewsCount: (json['reviews_count'] as num?)?.toInt()
+          ?? (json['reviewsCount'] as num?)?.toInt() ?? 0,
+      imageUrl: json['image_url'] as String? ?? json['imageUrl'] as String? ?? '',
       description: json['description'] as String? ?? '',
       location: json['location'] as String? ?? '',
-      isFeatured: json['isFeatured'] as bool? ?? false,
+      isFeatured: json['is_featured'] as bool? ?? json['isFeatured'] as bool? ?? false,
     );
   }
 }

@@ -43,18 +43,18 @@ class ItineraryItem {
 
   factory ItineraryItem.fromJson(Map<String, dynamic> json) {
     return ItineraryItem(
-      id: json['id'] as String? ?? '',
-      dayNumber: (json['dayNumber'] as num?)?.toInt() ?? 1,
-      timeSlot: json['timeSlot'] as String? ?? '09:00 AM',
+      id: (json['id'] ?? '').toString(),
+      dayNumber: (json['day_number'] as num?)?.toInt() ?? (json['dayNumber'] as num?)?.toInt() ?? 1,
+      timeSlot: json['time_slot'] as String? ?? json['timeSlot'] as String? ?? '09:00 AM',
       title: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
       location: json['location'] as String? ?? '',
       cost: (json['cost'] as num?)?.toDouble() ?? 0.0,
       category: json['category'] as String? ?? 'Activity',
-      activity: json['activity'] != null
-          ? Activity.fromJson(json['activity'] as Map<String, dynamic>)
+      activity: (json['Activity'] != null || json['activity'] != null)
+          ? Activity.fromJson((json['Activity'] ?? json['activity']) as Map<String, dynamic>)
           : null,
-      isCompleted: json['isCompleted'] as bool? ?? false,
+      isCompleted: json['is_completed'] as bool? ?? json['isCompleted'] as bool? ?? false,
     );
   }
 }

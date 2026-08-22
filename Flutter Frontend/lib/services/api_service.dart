@@ -3,11 +3,11 @@ import '../core/constants/app_constants.dart';
 import '../models/activity.dart';
 import '../models/city.dart';
 import '../models/trip.dart';
-import '../models/user.dart';
 
-/// API Service abstraction using Dio for future backend integration
+/// API Service — real HTTP calls to GlobeTrotter Express backend via Dio
 class ApiService {
   final Dio _dio;
+  String? _token;
 
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
@@ -27,67 +27,104 @@ class ApiService {
                 },
               ),
             ) {
+    // Auth token interceptor — auto-attach JWT to every request
     _dio.interceptors.add(
-      LogInterceptor(
-        request: true,
-        requestBody: true,
-        responseBody: true,
-        error: true,
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          if (_token != null) {
+            options.headers['Authorization'] = 'Bearer $_token';
+          }
+          handler.next(options);
+        },
+        onError: (DioException e, handler) {
+          handler.next(e);
+        },
       ),
+    );
+
+    _dio.interceptors.add(
+      LogInterceptor(request: true, requestBody: true, responseBody: true, error: true),
     );
   }
 
-  // --- Auth Endpoints (Phase 1 Frontend Placeholders) ---
-
-  Future<User?> login(String email, String password) async {
-    // In Phase 1, frontend dummy data is used.
-    // Future backend endpoint: POST /auth/login
-    return null;
+  /// Set the JWT token for authenticated requests
+  void setToken(String? token) {
+    _token = token;
   }
 
-  Future<User?> register(String name, String email, String password) async {
-    // Future backend endpoint: POST /auth/register
-    return null;
+  // ─── Auth Endpoints ──────────────────────────────────────────────────────
+
+  /// POST /api/auth/login → returns {token, user}
+  Future<Map<String, dynamic>> login(String email, String password) async {
+    final response = await _dio.post('/auth/login', data: {
+      'email': email.trim(),
+      'password': password,
+    });
+    return response.data as Map<String, dynamic>;
   }
 
-  // --- Trip Endpoints ---
+  /// POST /api/auth/signup → returns {token, user}
+  Future<Map<String, dynamic>> signup(String name, String email, String password) async {
+    final response = await _dio.post('/auth/signup', data: {
+      'name': name.trim(),
+      'email': email.trim(),
+      'password': password,
+    });
+    return response.data as Map<String, dynamic>;
+  }
 
+  // ─── Trip Endpoints ───────────────────────────────────────────────────────
+
+  /// GET /api/trips → returns list of trips for authenticated user
   Future<List<Trip>> getTrips() async {
-    // Future backend endpoint: GET /trips
-    return [];
+    try {
+      final response = await _dio.get('/trips');
+      final data = response.data;
+      final List list = data is List ? data : (data['trips'] ?? data['data'] ?? []);
+      return list.map((t) => Trip.fromJson(t as Map<String, dynamic>)).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
-  Future<Trip?> getTripById(String id) async {
-    // Future backend endpoint: GET /trips/:id
-    return null;
-  }
-
+  /// POST /api/trips → creates a new trip
   Future<Trip?> createTrip(Map<String, dynamic> tripData) async {
-    // Future backend endpoint: POST /trips
-    return null;
+    try {
+      final response = await _dio.post('/trips', data: tripData);
+      final data = response.data;
+      final tripJson = data['trip'] ?? data['data'] ?? data;
+      return Trip.fromJson(tripJson as Map<String, dynamic>);
+    } catch (_) {
+      return null;
+    }
   }
 
-  Future<bool> updateTrip(String id, Map<String, dynamic> updates) async {
-    // Future backend endpoint: PUT /trips/:id
-    return true;
-  }
+  // ─── City & Activity Endpoints ────────────────────────────────────────────
 
-  // --- Destinations & Activities Endpoints ---
-
+  /// GET /api/cities → returns all cities
   Future<List<City>> getCities({String? query}) async {
-    // Future backend endpoint: GET /cities
-    return [];
+    try {
+      final response = await _dio.get('/cities', queryParameters: query != null ? {'q': query} : null);
+      final data = response.data;
+      final List list = data is List ? data : (data['cities'] ?? data['data'] ?? []);
+      return list.map((c) => City.fromJson(c as Map<String, dynamic>)).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
+  /// GET /api/activities?cityId=:cityId → returns activities for a city
   Future<List<Activity>> getActivities(String cityId, {String? category}) async {
-    // Future backend endpoint: GET /cities/:cityId/activities
-    return [];
-  }
-
-  // --- Budget Endpoints ---
-
-  Future<Map<String, dynamic>> getBudget(String tripId) async {
-    // Future backend endpoint: GET /trips/:tripId/budget
-    return {};
+    try {
+      final response = await _dio.get('/activities', queryParameters: {
+        'cityId': cityId,
+        if (category != null && category != 'All') 'category': category,
+      });
+      final data = response.data;
+      final List list = data is List ? data : (data['activities'] ?? data['data'] ?? []);
+      return list.map((a) => Activity.fromJson(a as Map<String, dynamic>)).toList();
+    } catch (_) {
+      return [];
+    }
   }
 }
