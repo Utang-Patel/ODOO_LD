@@ -1,87 +1,72 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/constants/app_colors.dart';
-import '../core/constants/app_constants.dart';
-import '../core/constants/app_strings.dart';
 import '../providers/auth_provider.dart';
 
-/// Secondary navigation drawer for extended actions and settings
+/// Dark Theme Side Navigation Drawer matching the custom design
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authProvider);
-    final user = authState.user;
+    String currentRoute = '';
+    try {
+      currentRoute = GoRouterState.of(context).uri.toString();
+    } catch (_) {}
 
     return Drawer(
-      backgroundColor: AppColors.white,
+      backgroundColor: const Color(0xFF071724), // Dark Navy Background
       child: SafeArea(
         child: Column(
           children: [
-            // User Header Profile Card
-            Container(
-              padding: const EdgeInsets.all(AppConstants.paddingLarge),
-              decoration: const BoxDecoration(
-                gradient: AppColors.heroGradient,
-              ),
+            // Top Header: Logo & App Title
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundColor: AppColors.aqua,
-                    child: CircleAvatar(
-                      radius: 26,
-                      backgroundImage: user?.avatarUrl != null && user!.avatarUrl.isNotEmpty
-                          ? CachedNetworkImageProvider(user.avatarUrl)
-                          : null,
-                      child: user == null || user.avatarUrl.isEmpty
-                          ? const Icon(Icons.person, color: AppColors.white)
-                          : null,
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.25),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.public_rounded,
+                        color: AppColors.oceanBlue,
+                        size: 26,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  RichText(
+                    text: const TextSpan(
                       children: [
-                        Text(
-                          user?.name ?? 'Traveler',
-                          style: const TextStyle(
-                            color: AppColors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
+                        TextSpan(
+                          text: 'Globe',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          user?.email ?? 'wanderer@globetrotter.io',
-                          style: const TextStyle(
-                            color: AppColors.borderLight,
-                            fontSize: 12,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppColors.aqua.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(AppConstants.radiusFull),
-                            border: Border.all(color: AppColors.aqua.withValues(alpha: 0.4)),
-                          ),
-                          child: Text(
-                            'Score: ${user?.travelScore.toInt() ?? 850} pts',
-                            style: const TextStyle(
-                              color: AppColors.aqua,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                            ),
+                        TextSpan(
+                          text: 'Trotter',
+                          style: TextStyle(
+                            color: Color(0xFF00E5D9),
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5,
                           ),
                         ),
                       ],
@@ -90,88 +75,135 @@ class AppDrawer extends ConsumerWidget {
                 ],
               ),
             ),
+            const Divider(color: Color(0xFF1E3A52), height: 1, indent: 20, endIndent: 20),
+            const SizedBox(height: 12),
 
-            // Navigation Options
+            // Main Menu List
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
+                  _buildDrawerTile(
+                    context: context,
+                    icon: Icons.home_outlined,
+                    title: 'Dashboard',
+                    route: '/dashboard',
+                    currentRoute: currentRoute,
+                  ),
+                  _buildDrawerTile(
+                    context: context,
+                    icon: Icons.flight_outlined,
+                    title: 'My Trips',
+                    route: '/trips',
+                    currentRoute: currentRoute,
+                  ),
                   _buildDrawerTile(
                     context: context,
                     icon: Icons.add_circle_outline_rounded,
                     title: 'Plan New Trip',
                     route: '/create-trip',
-                    highlightColor: AppColors.oceanBlue,
+                    currentRoute: currentRoute,
+                  ),
+                  _buildDrawerTile(
+                    context: context,
+                    icon: Icons.language_outlined,
+                    title: 'Explore Cities',
+                    route: '/explore/cities',
+                    currentRoute: currentRoute,
+                  ),
+                  _buildDrawerTile(
+                    context: context,
+                    icon: Icons.confirmation_number_outlined,
+                    title: 'Activities',
+                    route: '/activities/city-paris',
+                    currentRoute: currentRoute,
+                  ),
+                  _buildDrawerTile(
+                    context: context,
+                    icon: Icons.calendar_today_outlined,
+                    title: 'Calendar',
+                    route: '/calendar',
+                    currentRoute: currentRoute,
                   ),
                   _buildDrawerTile(
                     context: context,
                     icon: Icons.account_balance_wallet_outlined,
-                    title: 'Budget & Cost Breakdown',
+                    title: 'Budget',
                     route: '/budget/trip-001',
+                    currentRoute: currentRoute,
                   ),
                   _buildDrawerTile(
                     context: context,
-                    icon: Icons.local_activity_outlined,
-                    title: 'Experiences & Activities',
-                    route: '/activities/city-paris',
-                  ),
-                  _buildDrawerTile(
-                    context: context,
-                    icon: Icons.share_location_outlined,
-                    title: 'Shared Public Itinerary',
+                    icon: Icons.share_outlined,
+                    title: 'Shared Trip',
                     route: '/shared/trip-001',
+                    currentRoute: currentRoute,
                   ),
                   _buildDrawerTile(
                     context: context,
-                    icon: Icons.admin_panel_settings_outlined,
-                    title: 'Admin & Analytics (Demo)',
-                    route: '/admin',
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Divider(height: 1),
-                  ),
-                  _buildDrawerTile(
-                    context: context,
-                    icon: Icons.settings_outlined,
-                    title: AppStrings.navSettings,
+                    icon: Icons.person_outline_rounded,
+                    title: 'Profile',
                     route: '/profile',
-                  ),
-                  _buildDrawerTile(
-                    context: context,
-                    icon: Icons.help_outline_rounded,
-                    title: 'Help & Documentation',
-                    onTap: () {
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('GlobeTrotter v1.0.0 — Empowering Personalized Travel'),
-                          backgroundColor: AppColors.oceanBlue,
-                        ),
-                      );
-                    },
+                    currentRoute: currentRoute,
                   ),
                 ],
               ),
             ),
 
-            // Logout Action
+            // Bottom Pro Card
             Padding(
-              padding: const EdgeInsets.all(AppConstants.paddingMedium),
-              child: ListTile(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-                  side: const BorderSide(color: AppColors.border),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0F2639),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFF1E3D59)),
                 ),
-                leading: const Icon(Icons.logout_rounded, color: AppColors.danger),
-                title: const Text(
-                  AppStrings.navLogout,
-                  style: TextStyle(
-                    color: AppColors.danger,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xFF00E5D9).withValues(alpha: 0.15),
+                        border: Border.all(color: const Color(0xFF00E5D9).withValues(alpha: 0.4)),
+                      ),
+                      child: const Icon(
+                        Icons.explore_outlined,
+                        color: Color(0xFF00E5D9),
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'GlobeTrotter Pro',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Multi-city smart route builder',
+                      style: TextStyle(
+                        color: Color(0xFF94A3B8),
+                        fontSize: 12,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
+              ),
+            ),
+
+            // Log Out Button
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+              child: InkWell(
                 onTap: () async {
                   Navigator.pop(context);
                   await ref.read(authProvider.notifier).logout();
@@ -179,6 +211,38 @@ class AppDrawer extends ConsumerWidget {
                     context.go('/login');
                   }
                 },
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: const Color(0xFFEF4444).withValues(alpha: 0.5),
+                      width: 1.2,
+                    ),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.logout_rounded,
+                        color: Color(0xFFEF4444),
+                        size: 20,
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        'Log Out',
+                        style: TextStyle(
+                          color: Color(0xFFEF4444),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
@@ -191,28 +255,52 @@ class AppDrawer extends ConsumerWidget {
     required BuildContext context,
     required IconData icon,
     required String title,
-    String? route,
-    VoidCallback? onTap,
-    Color? highlightColor,
+    required String route,
+    required String currentRoute,
   }) {
-    return ListTile(
-      leading: Icon(icon, color: highlightColor ?? AppColors.textSecondary, size: 22),
-      title: Text(
-        title,
-        style: TextStyle(
-          color: highlightColor ?? AppColors.textMain,
-          fontWeight: highlightColor != null ? FontWeight.w700 : FontWeight.w500,
-          fontSize: 14,
+    final bool isSelected = currentRoute == route ||
+        (route != '/dashboard' && currentRoute.startsWith(route)) ||
+        (route == '/dashboard' && (currentRoute == '/' || currentRoute == '/dashboard'));
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+            if (!isSelected) {
+              context.push(route);
+            }
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: isSelected ? const Color(0xFF00D5CF) : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  color: isSelected ? Colors.white : const Color(0xFF94A3B8),
+                  size: 22,
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : const Color(0xFFCBD5E1),
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    fontSize: 15,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
-      onTap: () {
-        Navigator.pop(context);
-        if (onTap != null) {
-          onTap();
-        } else if (route != null) {
-          context.push(route);
-        }
-      },
     );
   }
 }
