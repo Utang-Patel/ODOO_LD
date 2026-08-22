@@ -6,7 +6,6 @@ import '../core/constants/app_constants.dart';
 import '../core/constants/app_strings.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/app_drawer.dart';
-import '../widgets/mobile_bottom_nav.dart';
 
 /// Main Dashboard Scaffold with unified AppBar, Mobile Bottom Navigation, and Drawer
 class DashboardLayout extends ConsumerWidget {
@@ -126,9 +125,7 @@ class DashboardLayout extends ConsumerWidget {
       body: SafeArea(
         child: child,
       ),
-      bottomNavigationBar: currentIndex >= 0
-          ? MobileBottomNav(currentIndex: currentIndex)
-          : null,
+      bottomNavigationBar: null,
       floatingActionButton: floatingActionButton,
     );
   }
