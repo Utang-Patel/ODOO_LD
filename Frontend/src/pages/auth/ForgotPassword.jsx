@@ -7,7 +7,7 @@ const ForgotPassword = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (email) {
+    if (email.trim()) {
       setSubmitted(true);
     }
   };
@@ -16,17 +16,17 @@ const ForgotPassword = () => {
     <div className="gt-card p-4 p-sm-5 shadow-lg border-0">
       <div className="text-center mb-4">
         <h3 className="font-heading fw-extrabold text-navy-deep mb-1">Forgot Password? 🔑</h3>
-        <p className="text-muted small">Enter your email and we'll send you a password reset link.</p>
+        <p className="text-muted small">Enter your email and we'll process your password reset request.</p>
       </div>
 
       {submitted ? (
         <div className="text-center py-3">
           <div className="d-inline-flex align-items-center justify-content-center bg-light text-success rounded-circle p-3 mb-3">
-            <i className="bi bi-check-circle fs-2"></i>
+            <i className="bi bi-envelope-check fs-2"></i>
           </div>
-          <h5 className="font-heading fw-bold text-navy-deep mb-2">Check Your Inbox</h5>
+          <h5 className="font-heading fw-bold text-navy-deep mb-2">Request Processed</h5>
           <p className="text-muted small mb-4">
-            We have sent password reset instructions to <strong>{email}</strong>.
+            If an account exists with <strong>{email}</strong>, a password reset link has been dispatched to your inbox.
           </p>
           <Link to="/login" className="btn btn-gt-outline w-100 py-2.5 rounded-3">
             Back to Login

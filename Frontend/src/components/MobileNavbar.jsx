@@ -1,6 +1,7 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import logoPng from "../assets/logo.png";
 
 const MobileNavbar = ({ show, onHide }) => {
   const { user, logout } = useAuth();
@@ -50,10 +51,15 @@ const MobileNavbar = ({ show, onHide }) => {
       >
         <div className="offcanvas-header border-bottom border-secondary border-opacity-25 px-4 py-3">
           <div className="d-flex align-items-center gap-2">
-            <div className="d-flex align-items-center justify-content-center bg-ocean-gradient text-white rounded-3 p-2">
-              <i className="bi bi-airplane-engines fs-5"></i>
-            </div>
-            <h5 className="offcanvas-title font-heading fw-bold text-white mb-0">GlobeTrotter</h5>
+            <img
+              src={logoPng}
+              alt="GlobeTrotter Logo"
+              className="rounded-3 shadow-sm bg-white p-1"
+              style={{ width: "38px", height: "38px", objectFit: "contain" }}
+            />
+            <h5 className="offcanvas-title font-heading fw-bold text-white mb-0">
+              Globe<span className="text-aqua">Trotter</span>
+            </h5>
           </div>
           <button
             type="button"

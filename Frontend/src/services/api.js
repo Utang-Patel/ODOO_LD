@@ -7,7 +7,7 @@ const api = axios.create({
   },
 });
 
-// Request interceptor to attach JWT token if available in local state
+// Request interceptor to attach Bearer JWT token automatically
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("globetrotter_token");
