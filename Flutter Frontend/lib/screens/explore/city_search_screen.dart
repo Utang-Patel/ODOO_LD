@@ -33,6 +33,7 @@ class CitySearchScreen extends ConsumerWidget {
 
     return DashboardLayout(
       currentIndex: 2,
+      showBackButton: true,
       title: 'Explore Destinations',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

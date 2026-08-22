@@ -40,6 +40,7 @@ class _MyTripsScreenState extends ConsumerState<MyTripsScreen> with SingleTicker
 
     return DashboardLayout(
       currentIndex: 1,
+      showBackButton: true,
       title: 'My Journeys',
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/create-trip'),

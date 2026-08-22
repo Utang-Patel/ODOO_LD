@@ -22,6 +22,7 @@ class ProfileScreen extends ConsumerWidget {
 
     return DashboardLayout(
       currentIndex: 4,
+      showBackButton: true,
       title: 'Traveler Passport',
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),

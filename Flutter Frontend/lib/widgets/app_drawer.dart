@@ -39,11 +39,11 @@ class AppDrawer extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.public_rounded,
-                        color: AppColors.oceanBlue,
-                        size: 26,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),
@@ -94,7 +94,7 @@ class AppDrawer extends ConsumerWidget {
                     context: context,
                     icon: Icons.flight_outlined,
                     title: 'My Trips',
-                    route: '/trips',
+                    route: '/my-trips',
                     currentRoute: currentRoute,
                   ),
                   _buildDrawerTile(
@@ -108,7 +108,7 @@ class AppDrawer extends ConsumerWidget {
                     context: context,
                     icon: Icons.language_outlined,
                     title: 'Explore Cities',
-                    route: '/explore/cities',
+                    route: '/cities',
                     currentRoute: currentRoute,
                   ),
                   _buildDrawerTile(
@@ -122,7 +122,7 @@ class AppDrawer extends ConsumerWidget {
                     context: context,
                     icon: Icons.calendar_today_outlined,
                     title: 'Calendar',
-                    route: '/calendar',
+                    route: '/calendar/trip-001',
                     currentRoute: currentRoute,
                   ),
                   _buildDrawerTile(
@@ -150,55 +150,7 @@ class AppDrawer extends ConsumerWidget {
               ),
             ),
 
-            // Bottom Pro Card
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0F2639),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFF1E3D59)),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: const Color(0xFF00E5D9).withValues(alpha: 0.15),
-                        border: Border.all(color: const Color(0xFF00E5D9).withValues(alpha: 0.4)),
-                      ),
-                      child: const Icon(
-                        Icons.explore_outlined,
-                        color: Color(0xFF00E5D9),
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'GlobeTrotter Pro',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      'Multi-city smart route builder',
-                      style: TextStyle(
-                        color: Color(0xFF94A3B8),
-                        fontSize: 12,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            ),
+
 
             // Log Out Button
             Padding(

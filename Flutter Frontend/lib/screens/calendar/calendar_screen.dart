@@ -41,6 +41,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     if (trip == null) {
       return DashboardLayout(
         currentIndex: 3,
+        showBackButton: true,
         title: 'Trip Calendar',
         child: const Center(child: Text('No active trip found.')),
       );
@@ -51,6 +52,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
     return DashboardLayout(
       currentIndex: 3,
+      showBackButton: true,
       title: 'Trip Calendar & Timeline',
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),

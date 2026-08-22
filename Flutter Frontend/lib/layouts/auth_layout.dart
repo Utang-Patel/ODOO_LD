@@ -144,10 +144,12 @@ class AuthLayout extends StatelessWidget {
       crossAxisAlignment: isLeftAligned ? CrossAxisAlignment.start : CrossAxisAlignment.center,
       children: [
         Container(
-          padding: const EdgeInsets.all(12),
+          width: 80,
+          height: 80,
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
+            color: Colors.white,
             shape: BoxShape.circle,
-            gradient: AppColors.primaryGradient,
             boxShadow: [
               BoxShadow(
                 color: AppColors.aqua.withValues(alpha: 0.35),
@@ -156,10 +158,9 @@ class AuthLayout extends StatelessWidget {
               ),
             ],
           ),
-          child: const Icon(
-            Icons.travel_explore_rounded,
-            size: 36,
-            color: AppColors.white,
+          child: Image.asset(
+            'assets/images/logo.png',
+            fit: BoxFit.contain,
           ),
         ).animate().scale(duration: const Duration(milliseconds: 500)),
         const SizedBox(height: 12),

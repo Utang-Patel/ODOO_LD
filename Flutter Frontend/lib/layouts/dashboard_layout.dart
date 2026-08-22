@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/constants/app_colors.dart';
-import '../core/constants/app_constants.dart';
 import '../core/constants/app_strings.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/app_drawer.dart';
@@ -33,7 +32,7 @@ class DashboardLayout extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.cloud,
-      drawer: const AppDrawer(),
+      drawer: showBackButton ? null : const AppDrawer(),
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
@@ -65,17 +64,11 @@ class DashboardLayout extends ConsumerWidget {
               )
             : Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
-                    ),
-                    child: const Icon(
-                      Icons.flight_takeoff_rounded,
-                      size: 16,
-                      color: AppColors.white,
-                    ),
+                  Image.asset(
+                    'assets/images/logo.png',
+                    width: 32,
+                    height: 32,
+                    fit: BoxFit.contain,
                   ),
                   const SizedBox(width: 8),
                   const Text(
