@@ -70,7 +70,7 @@ class RoutePreview extends StatelessWidget {
           LayoutBuilder(
             builder: (context, constraints) {
               return SizedBox(
-                height: 72,
+                height: 80,
                 child: Stack(
                   alignment: Alignment.centerLeft,
                   children: [
