@@ -70,7 +70,7 @@ export const signup = async (req, res) => {
       name: name.trim(),
       email: email.toLowerCase().trim(),
       password: hashedPassword,
-      profile_image: `https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80`
+      profile_image: null
     });
 
     // Generate JWT token
@@ -149,6 +149,53 @@ export const login = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Server error during login',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Reset password with email & new password
+// @route   POST /api/auth/reset-password
+// @access  Public
+export const resetPassword = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !isValidEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email address'
+      });
+    }
+
+    if (!password || password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 8 characters long.'
+      });
+    }
+
+    const user = await User.findOne({ where: { email: email.toLowerCase().trim() } });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'No account found with this email address.'
+      });
+    }
+
+    const saltRounds = 10;
+    user.password = await bcrypt.hash(password, saltRounds);
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password reset successfully! You can now log in with your new password.'
+    });
+  } catch (error) {
+    console.error('[Reset Password Controller Error]:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error during password reset',
       error: error.message
     });
   }
