@@ -1,6 +1,7 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import logoPng from "../assets/logo.png";
 
 const Sidebar = () => {
   const { logout } = useAuth();
@@ -26,12 +27,20 @@ const Sidebar = () => {
 
   return (
     <aside className="sidebar-desktop d-none d-lg-flex flex-column justify-between p-3 border-end">
-      {/* Top Branding Section */}
+      {/* Top Branding Logo & Section Header */}
       <div>
         <div className="px-3 py-3 mb-3 border-bottom border-secondary border-opacity-25">
-          <span className="text-uppercase text-white-50 fs-7 fw-bold tracking-wider">
-            Main Menu
-          </span>
+          <NavLink to="/dashboard" className="d-flex align-items-center gap-2 text-decoration-none">
+            <img
+              src={logoPng}
+              alt="GlobeTrotter Logo"
+              className="rounded-3 shadow-sm bg-white p-1"
+              style={{ width: "42px", height: "42px", objectFit: "contain" }}
+            />
+            <span className="font-heading fs-4 fw-bold text-white">
+              Globe<span className="text-aqua">Trotter</span>
+            </span>
+          </NavLink>
         </div>
 
         {/* Links Navigation */}

@@ -18,6 +18,7 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 import Dashboard from "./pages/dashboard/Dashboard";
 import CreateTrip from "./pages/trips/CreateTrip";
 import MyTrips from "./pages/trips/MyTrips";
+import EditTrip from "./pages/trips/EditTrip";
 import ItineraryBuilder from "./pages/trips/ItineraryBuilder";
 import ItineraryView from "./pages/trips/ItineraryView";
 import CitySearch from "./pages/explore/CitySearch";
@@ -43,9 +44,6 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
           </Route>
 
-          {/* Public Read-Only Shared Trip Route */}
-          <Route path="/shared/:tripId" element={<SharedTrip />} />
-
           {/* Protected Dashboard & App Routes wrapped in DashboardLayout */}
           <Route
             element={
@@ -57,12 +55,14 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/create-trip" element={<CreateTrip />} />
             <Route path="/my-trips" element={<MyTrips />} />
+            <Route path="/trips/:id/edit" element={<EditTrip />} />
             <Route path="/itinerary/:tripId" element={<ItineraryBuilder />} />
             <Route path="/itinerary/:tripId/view" element={<ItineraryView />} />
             <Route path="/cities" element={<CitySearch />} />
             <Route path="/activities/:cityId" element={<ActivitySearch />} />
             <Route path="/budget/:tripId" element={<Budget />} />
             <Route path="/calendar/:tripId" element={<Calendar />} />
+            <Route path="/shared/:tripId" element={<SharedTrip />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/admin" element={<AdminDashboard />} />
           </Route>

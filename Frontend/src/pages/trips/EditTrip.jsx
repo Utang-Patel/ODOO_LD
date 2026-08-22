@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import PageHeader from "../../components/PageHeader";
+import Loading from "../../components/Loading";
 import tripService from "../../services/tripService";
 
 const PRESET_COVERS = [
@@ -12,7 +13,8 @@ const PRESET_COVERS = [
   { name: "Dubai Desert", url: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=800&q=80" }
 ];
 
-const CreateTrip = () => {
+const EditTrip = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -23,11 +25,37 @@ const CreateTrip = () => {
     cover_image: PRESET_COVERS[0].url
   });
 
-  const [customCoverUrl, setCustomCoverUrl] = useState("");
-  const [useCustomUrl, setUseCustomUrl] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+
+  useEffect(() => {
+    const fetchTripDetails = async () => {
+      try {
+        setInitialLoading(true);
+        const res = await tripService.getTrip(id);
+
+        if (res.success && res.trip) {
+          const t = res.trip;
+          setFormData({
+            trip_name: t.trip_name || "",
+            description: t.description || "",
+            start_date: t.start_date || "",
+            end_date: t.end_date || "",
+            cover_image: t.cover_image || PRESET_COVERS[0].url
+          });
+        }
+      } catch (err) {
+        console.error("[Edit Trip Fetch Error]:", err);
+        setError("Unable to load trip details for editing.");
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+
+    fetchTripDetails();
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,14 +64,7 @@ const CreateTrip = () => {
   };
 
   const handleSelectPreset = (url) => {
-    setUseCustomUrl(false);
     setFormData((prev) => ({ ...prev, cover_image: url }));
-  };
-
-  const handleApplyCustomUrl = () => {
-    if (customCoverUrl.trim()) {
-      setFormData((prev) => ({ ...prev, cover_image: customCoverUrl.trim() }));
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -56,13 +77,8 @@ const CreateTrip = () => {
       return;
     }
 
-    if (!formData.start_date) {
-      setError("Start date is required.");
-      return;
-    }
-
-    if (!formData.end_date) {
-      setError("End date is required.");
+    if (!formData.start_date || !formData.end_date) {
+      setError("Both start date and end date are required.");
       return;
     }
 
@@ -72,39 +88,42 @@ const CreateTrip = () => {
     }
 
     try {
-      setLoading(true);
-      const activeCover = useCustomUrl && customCoverUrl.trim() ? customCoverUrl.trim() : formData.cover_image;
+      setSubmitting(true);
 
       const payload = {
         trip_name: formData.trip_name.trim(),
         description: formData.description.trim(),
         start_date: formData.start_date,
         end_date: formData.end_date,
-        cover_image: activeCover
+        cover_image: formData.cover_image
       };
 
-      const res = await tripService.createTrip(payload);
+      const res = await tripService.updateTrip(id, payload);
 
-      setSuccessMessage(res.message || "Trip created successfully! ✈️");
+      setSuccessMessage(res.message || "Trip updated successfully!");
 
       setTimeout(() => {
         navigate("/my-trips");
-      }, 1200);
+      }, 1000);
     } catch (err) {
-      console.error("[Create Trip Error]:", err);
-      const apiMsg = err.response?.data?.message || "Failed to create trip. Please check details and try again.";
+      console.error("[Update Trip Error]:", err);
+      const apiMsg = err.response?.data?.message || "Failed to update trip. Please try again.";
       setError(apiMsg);
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
+
+  if (initialLoading) {
+    return <Loading message="Loading trip details..." />;
+  }
 
   return (
     <div>
       <PageHeader
-        title="Plan New Trip"
-        subtitle="Create your multi-city itinerary starting with basic trip dates."
-        breadcrumbs={[{ label: "My Trips", path: "/my-trips" }, { label: "Plan New Trip" }]}
+        title="Edit Trip"
+        subtitle={`Update trip details for "${formData.trip_name || "Your Trip"}"`}
+        breadcrumbs={[{ label: "My Trips", path: "/my-trips" }, { label: "Edit Trip" }]}
       />
 
       {error && (
@@ -122,45 +141,38 @@ const CreateTrip = () => {
       )}
 
       <div className="row g-4">
-        {/* Left Column: Visual Cover Preview & Selection */}
+        {/* Left Column: Cover Preview & Presets */}
         <div className="col-lg-5">
           <div className="gt-card p-4 h-100 d-flex flex-column justify-content-between">
             <div>
-              <h5 className="font-heading fw-bold text-navy-deep mb-3">Cover Image Preview</h5>
+              <h5 className="font-heading fw-bold text-navy-deep mb-3">Cover Image</h5>
 
-              {/* Cover Preview Card */}
-              <div className="position-relative rounded-4 overflow-hidden shadow-sm mb-4" style={{ height: "240px" }}>
+              <div className="position-relative rounded-4 overflow-hidden shadow-sm mb-4" style={{ height: "220px" }}>
                 <img
-                  src={useCustomUrl && customCoverUrl ? customCoverUrl : formData.cover_image}
+                  src={formData.cover_image}
                   alt="Trip Cover Preview"
                   className="w-100 h-100"
                   style={{ objectFit: "cover" }}
-                  onError={(e) => {
-                    e.target.src = PRESET_COVERS[0].url;
-                  }}
                 />
                 <div
                   className="position-absolute top-0 start-0 w-100 h-100"
                   style={{ background: "linear-gradient(to bottom, transparent 40%, rgba(7,26,43,0.85))" }}
                 ></div>
                 <div className="position-absolute bottom-0 start-0 m-3 text-white">
-                  <span className="badge bg-sunset-gradient text-navy-deep fw-bold mb-1">Preview</span>
-                  <h5 className="font-heading fw-bold text-white mb-0">
-                    {formData.trip_name.trim() || "Your Trip Name"}
-                  </h5>
+                  <span className="badge bg-ocean-gradient text-white fw-bold mb-1">Active Cover</span>
+                  <h5 className="font-heading fw-bold text-white mb-0">{formData.trip_name || "Trip Name"}</h5>
                 </div>
               </div>
 
-              {/* Preset Selector */}
-              <label className="form-label text-navy-deep fw-semibold small mb-2">Select Preset Cover</label>
-              <div className="row g-2 mb-3">
+              <label className="form-label text-navy-deep fw-semibold small mb-2">Change Preset Cover</label>
+              <div className="row g-2">
                 {PRESET_COVERS.map((preset, idx) => (
                   <div key={idx} className="col-4">
                     <button
                       type="button"
                       onClick={() => handleSelectPreset(preset.url)}
                       className={`btn p-0 w-100 rounded-3 overflow-hidden border border-2 transition-all ${
-                        !useCustomUrl && formData.cover_image === preset.url ? "border-primary shadow" : "border-transparent opacity-75"
+                        formData.cover_image === preset.url ? "border-primary shadow" : "border-transparent opacity-75"
                       }`}
                       style={{ height: "60px" }}
                     >
@@ -168,37 +180,6 @@ const CreateTrip = () => {
                     </button>
                   </div>
                 ))}
-              </div>
-
-              {/* Custom Image URL Option */}
-              <div className="mt-3 pt-3 border-top">
-                <div className="form-check mb-2">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="useCustomUrl"
-                    checked={useCustomUrl}
-                    onChange={(e) => setUseCustomUrl(e.target.checked)}
-                  />
-                  <label className="form-check-label text-secondary small fw-semibold" htmlFor="useCustomUrl">
-                    Use Custom Image URL
-                  </label>
-                </div>
-
-                {useCustomUrl && (
-                  <div className="input-group">
-                    <input
-                      type="url"
-                      className="form-control form-control-sm bg-light"
-                      placeholder="https://example.com/cover.jpg"
-                      value={customCoverUrl}
-                      onChange={(e) => setCustomCoverUrl(e.target.value)}
-                    />
-                    <button type="button" className="btn btn-gt-outline btn-sm" onClick={handleApplyCustomUrl}>
-                      Apply
-                    </button>
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -208,12 +189,11 @@ const CreateTrip = () => {
         <div className="col-lg-7">
           <div className="gt-card p-4 p-md-5">
             <div className="mb-4">
-              <h3 className="font-heading fw-extrabold text-navy-deep mb-1">Create Your Adventure ✈️</h3>
-              <p className="text-muted small">Plan your next journey with GlobeTrotter.</p>
+              <h3 className="font-heading fw-extrabold text-navy-deep mb-1">Edit Your Trip</h3>
+              <p className="text-muted small">Update your itinerary title, description, or dates.</p>
             </div>
 
             <form onSubmit={handleSubmit} noValidate>
-              {/* Trip Name */}
               <div className="mb-4">
                 <label className="form-label text-navy-deep fw-semibold">
                   Trip Name <span className="text-danger">*</span>
@@ -221,15 +201,13 @@ const CreateTrip = () => {
                 <input
                   type="text"
                   name="trip_name"
-                  className={`form-control form-control-lg bg-light border-0 shadow-none ${error && !formData.trip_name ? "is-invalid" : ""}`}
-                  placeholder="e.g. Europe Adventure, Tokyo Gateway..."
+                  className="form-control form-control-lg bg-light border-0 shadow-none"
                   value={formData.trip_name}
                   onChange={handleChange}
                   required
                 />
               </div>
 
-              {/* Date Inputs Row */}
               <div className="row g-3 mb-4">
                 <div className="col-md-6">
                   <label className="form-label text-navy-deep fw-semibold">
@@ -259,40 +237,35 @@ const CreateTrip = () => {
                 </div>
               </div>
 
-              {/* Description */}
               <div className="mb-4">
-                <label className="form-label text-navy-deep fw-semibold">
-                  Description <span className="text-muted small">(Optional)</span>
-                </label>
+                <label className="form-label text-navy-deep fw-semibold">Description</label>
                 <textarea
                   name="description"
                   rows="4"
                   className="form-control bg-light border-0 shadow-none"
-                  placeholder="Summarize your travel plans, goals, or notes..."
                   value={formData.description}
                   onChange={handleChange}
                 ></textarea>
               </div>
 
-              {/* Actions */}
               <div className="d-flex align-items-center justify-content-end gap-3 pt-3 border-top">
                 <Link to="/my-trips" className="btn btn-gt-outline px-4">
                   Cancel
                 </Link>
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={submitting}
                   className="btn btn-gt-primary px-4 py-2.5 font-heading fw-bold d-flex align-items-center gap-2"
                 >
-                  {loading ? (
+                  {submitting ? (
                     <>
                       <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                      <span>Creating Trip...</span>
+                      <span>Saving Changes...</span>
                     </>
                   ) : (
                     <>
-                      <i className="bi bi-check2-circle fs-5"></i>
-                      <span>Create Trip</span>
+                      <i className="bi bi-save me-1"></i>
+                      <span>Save Changes</span>
                     </>
                   )}
                 </button>
@@ -305,4 +278,4 @@ const CreateTrip = () => {
   );
 };
 
-export default CreateTrip;
+export default EditTrip;

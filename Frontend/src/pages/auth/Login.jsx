@@ -1,23 +1,43 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
-  const [email, setEmail] = useState("alex.morgan@globetrotter.io");
-  const [password, setPassword] = useState("password123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleSubmit = (e) => {
+  const from = location.state?.from?.pathname || "/dashboard";
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
-      setError("Please fill in all fields");
+    if (!email.trim() || !password) {
+      setError("Please enter both email and password.");
       return;
     }
+
     setError("");
-    login(email, password);
-    navigate("/dashboard");
+    setSuccessMsg("");
+    setLoading(true);
+
+    const result = await login(email, password);
+    setLoading(false);
+
+    if (result.success) {
+      setSuccessMsg("Login successful!");
+      setTimeout(() => {
+        navigate(from, { replace: true });
+      }, 800);
+    } else {
+      setError(result.message || "Invalid email or password.");
+    }
   };
 
   return (
@@ -28,8 +48,16 @@ const Login = () => {
       </div>
 
       {error && (
-        <div className="alert alert-danger py-2 small mb-3" role="alert">
-          {error}
+        <div className="alert alert-danger py-2 small mb-3 d-flex align-items-center gap-2" role="alert">
+          <i className="bi bi-exclamation-circle-fill"></i>
+          <span>{error}</span>
+        </div>
+      )}
+
+      {successMsg && (
+        <div className="alert alert-success py-2 small mb-3 d-flex align-items-center gap-2" role="alert">
+          <i className="bi bi-check-circle-fill"></i>
+          <span>{successMsg}</span>
         </div>
       )}
 
@@ -44,6 +72,7 @@ const Login = () => {
               placeholder="name@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
               required
             />
           </div>
@@ -59,18 +88,38 @@ const Login = () => {
           <div className="position-relative">
             <i className="bi bi-lock position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
             <input
-              type="password"
-              className="form-control ps-5 py-2.5 rounded-3"
+              type={showPassword ? "text" : "password"}
+              className="form-control ps-5 pe-5 py-2.5 rounded-3"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
               required
             />
+            <button
+              type="button"
+              className="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 text-muted p-0 border-0"
+              onClick={() => setShowPassword(!showPassword)}
+              tabIndex="-1"
+            >
+              <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+            </button>
           </div>
         </div>
 
-        <button type="submit" className="btn btn-gt-primary w-100 py-2.5 rounded-3 mb-3 fw-bold">
-          Log In
+        <button
+          type="submit"
+          className="btn btn-gt-primary w-100 py-2.5 rounded-3 mb-3 fw-bold d-flex align-items-center justify-content-center gap-2"
+          disabled={loading}
+        >
+          {loading ? (
+            <>
+              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              <span>Logging in...</span>
+            </>
+          ) : (
+            <span>Login</span>
+          )}
         </button>
 
         <div className="text-center">

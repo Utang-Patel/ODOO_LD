@@ -1,81 +1,104 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import * as authService from "../services/authService";
 
 const AuthContext = createContext();
 
-const DEFAULT_USER = {
-  id: "usr_101",
-  name: "Alex Morgan",
-  email: "alex.morgan@globetrotter.io",
-  avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
-  role: "traveler",
-  languagePreference: "English",
-  currency: "INR (₹)"
-};
-
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem("globetrotter_user");
-    return savedUser ? JSON.parse(savedUser) : DEFAULT_USER;
-  });
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(() => localStorage.getItem("globetrotter_token") || null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem("globetrotter_auth") === "true";
-  });
-
+  // Initialize Auth state on App mount
   useEffect(() => {
-    // Sync initial state if needed
-    if (!localStorage.getItem("globetrotter_user")) {
-      localStorage.setItem("globetrotter_user", JSON.stringify(DEFAULT_USER));
-      localStorage.setItem("globetrotter_auth", "true");
-    }
+    const initAuth = async () => {
+      const storedToken = localStorage.getItem("globetrotter_token");
+      if (storedToken) {
+        try {
+          const data = await authService.getCurrentUser();
+          if (data && data.success && data.user) {
+            setUser(data.user);
+            setToken(storedToken);
+            setIsAuthenticated(true);
+          } else {
+            logout();
+          }
+        } catch (error) {
+          console.warn("[Auth Context] Failed to verify existing session token:", error?.response?.data?.message || error.message);
+          logout();
+        }
+      } else {
+        setIsAuthenticated(false);
+        setUser(null);
+      }
+      setLoading(false);
+    };
+
+    initAuth();
   }, []);
 
-  const login = (email, password) => {
-    const userData = {
-      ...DEFAULT_USER,
-      email: email || DEFAULT_USER.email,
-    };
-    setUser(userData);
-    setIsAuthenticated(true);
-    localStorage.setItem("globetrotter_user", JSON.stringify(userData));
-    localStorage.setItem("globetrotter_auth", "true");
-    localStorage.setItem("globetrotter_token", "mock_jwt_token_globetrotter_12345");
-    return { success: true };
+  const login = async (email, password) => {
+    try {
+      const data = await authService.login({ email, password });
+      if (data && data.success) {
+        const authToken = data.token;
+        const authUser = data.user;
+
+        localStorage.setItem("globetrotter_token", authToken);
+        if (authUser) {
+          localStorage.setItem("globetrotter_user", JSON.stringify(authUser));
+        }
+
+        setToken(authToken);
+        setUser(authUser);
+        setIsAuthenticated(true);
+        return { success: true, message: data.message || "Login successful!" };
+      } else {
+        return { success: false, message: data.message || "Invalid credentials" };
+      }
+    } catch (error) {
+      const errorMessage = error?.response?.data?.message || "Unable to connect to the server. Please try again.";
+      return { success: false, message: errorMessage };
+    }
   };
 
-  const signup = (name, email, password) => {
-    const userData = {
-      ...DEFAULT_USER,
-      name: name || "New Traveler",
-      email: email || "traveler@globetrotter.io",
-    };
-    setUser(userData);
-    setIsAuthenticated(true);
-    localStorage.setItem("globetrotter_user", JSON.stringify(userData));
-    localStorage.setItem("globetrotter_auth", "true");
-    localStorage.setItem("globetrotter_token", "mock_jwt_token_globetrotter_12345");
-    return { success: true };
+  const signup = async (name, email, password) => {
+    try {
+      const data = await authService.signup({ name, email, password });
+      if (data && data.success) {
+        return { success: true, message: data.message || "Account created successfully!" };
+      } else {
+        return { success: false, message: data.message || "Signup failed." };
+      }
+    } catch (error) {
+      const errorMessage = error?.response?.data?.message || "Unable to connect to the server. Please try again.";
+      return { success: false, message: errorMessage };
+    }
   };
 
   const logout = () => {
+    localStorage.removeItem("globetrotter_token");
+    localStorage.removeItem("globetrotter_user");
+    setToken(null);
     setUser(null);
     setIsAuthenticated(false);
-    localStorage.removeItem("globetrotter_user");
-    localStorage.setItem("globetrotter_auth", "false");
-    localStorage.removeItem("globetrotter_token");
   };
 
   const updateUserProfile = (updatedFields) => {
-    const updated = { ...user, ...updatedFields };
-    setUser(updated);
-    localStorage.setItem("globetrotter_user", JSON.stringify(updated));
+    setUser((prev) => {
+      const updated = { ...prev, ...updatedFields };
+      localStorage.setItem("globetrotter_user", JSON.stringify(updated));
+      return updated;
+    });
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
+        token,
         isAuthenticated,
+        loading,
         login,
         signup,
         logout,

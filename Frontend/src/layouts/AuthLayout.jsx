@@ -1,5 +1,6 @@
 import React from "react";
 import { Outlet, Link } from "react-router-dom";
+import logoPng from "../assets/logo.png";
 
 const AuthLayout = () => {
   return (
@@ -21,10 +22,13 @@ const AuthLayout = () => {
             {/* Top Logo */}
             <div className="position-relative z-1">
               <Link to="/" className="d-inline-flex align-items-center gap-2 text-decoration-none">
-                <div className="d-flex align-items-center justify-content-center bg-ocean-gradient text-white rounded-3 p-2">
-                  <i className="bi bi-airplane-engines fs-4"></i>
-                </div>
-                <span className="font-heading fs-3 fw-bold text-white">GlobeTrotter</span>
+                <img
+                  src={logoPng}
+                  alt="GlobeTrotter Logo"
+                  className="rounded-3 shadow-sm bg-white p-1"
+                  style={{ width: "44px", height: "44px", objectFit: "contain" }}
+                />
+                <span className="font-heading fs-3 fw-bold text-white">Globe<span className="text-aqua">Trotter</span></span>
               </Link>
             </div>
 

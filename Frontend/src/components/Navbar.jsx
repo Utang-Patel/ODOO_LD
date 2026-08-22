@@ -24,18 +24,6 @@ const Navbar = ({ onToggleMobileSidebar }) => {
           <i className="bi bi-list fs-4"></i>
         </button>
 
-        {/* Brand Logo */}
-        <Link to="/dashboard" className="navbar-brand d-flex align-items-center gap-2 me-4">
-          <div
-            className="d-flex align-items-center justify-content-center bg-ocean-gradient text-white rounded-3 shadow-sm"
-            style={{ width: "38px", height: "38px" }}
-          >
-            <i className="bi bi-airplane-engines fs-5"></i>
-          </div>
-          <span className="font-heading fs-4 fw-bold text-navy-deep">
-            Globe<span className="text-ocean-gradient">Trotter</span>
-          </span>
-        </Link>
 
         {/* Quick Search Bar */}
         <div className="d-none d-md-flex align-items-center me-auto position-relative" style={{ width: "320px" }}>
