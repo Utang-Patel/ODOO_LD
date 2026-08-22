@@ -44,6 +44,11 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
           </Route>
 
+          {/* Standalone Public Shared Trip Route (No Login Required) */}
+          <Route path="/shared/:shareToken" element={<DashboardLayout />}>
+            <Route index element={<SharedTrip />} />
+          </Route>
+
           {/* Protected Dashboard & App Routes wrapped in DashboardLayout */}
           <Route
             element={
@@ -62,9 +67,15 @@ function App() {
             <Route path="/activities/:cityId" element={<ActivitySearch />} />
             <Route path="/budget/:tripId" element={<Budget />} />
             <Route path="/calendar/:tripId" element={<Calendar />} />
-            <Route path="/shared/:tripId" element={<SharedTrip />} />
             <Route path="/profile" element={<Profile />} />
+            
+            {/* Admin Sub-Routes */}
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<AdminDashboard />} />
+            <Route path="/admin/trips" element={<AdminDashboard />} />
+            <Route path="/admin/analytics" element={<AdminDashboard />} />
+            <Route path="/admin/cities" element={<AdminDashboard />} />
+            <Route path="/admin/activities" element={<AdminDashboard />} />
           </Route>
 
           {/* Catch-all fallback */}

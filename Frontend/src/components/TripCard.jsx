@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { formatDateRange, calculateTripDays, getTripStatus } from "../utils/dateUtils";
 
-const TripCard = ({ trip, onDelete }) => {
+const TripCard = ({ trip, onDelete, onShare }) => {
   if (!trip) return null;
 
   const startDate = trip.start_date || trip.startDate;
@@ -82,6 +82,16 @@ const TripCard = ({ trip, onDelete }) => {
           </Link>
 
           <div className="d-flex gap-2">
+            {onShare && (
+              <button
+                onClick={() => onShare(trip)}
+                className="btn btn-sm btn-light border text-ocean-blue px-2.5"
+                title="Share Trip"
+              >
+                <i className="bi bi-share"></i>
+              </button>
+            )}
+
             <Link
               to={`/trips/${trip.id}/edit`}
               className="btn btn-sm btn-light border text-navy-deep px-2.5"

@@ -20,7 +20,9 @@ const CreateTrip = () => {
     description: "",
     start_date: "",
     end_date: "",
-    cover_image: PRESET_COVERS[0].url
+    cover_image: PRESET_COVERS[0].url,
+    budget_limit: "",
+    currency: "INR"
   });
 
   const [customCoverUrl, setCustomCoverUrl] = useState("");
@@ -71,6 +73,14 @@ const CreateTrip = () => {
       return;
     }
 
+    if (formData.budget_limit) {
+      const parsed = parseFloat(formData.budget_limit);
+      if (isNaN(parsed) || parsed <= 0) {
+        setError("Budget limit must be greater than zero.");
+        return;
+      }
+    }
+
     try {
       setLoading(true);
       const activeCover = useCustomUrl && customCoverUrl.trim() ? customCoverUrl.trim() : formData.cover_image;
@@ -80,7 +90,9 @@ const CreateTrip = () => {
         description: formData.description.trim(),
         start_date: formData.start_date,
         end_date: formData.end_date,
-        cover_image: activeCover
+        cover_image: activeCover,
+        budget_limit: formData.budget_limit ? parseFloat(formData.budget_limit) : null,
+        currency: formData.currency || "INR"
       };
 
       const res = await tripService.createTrip(payload);
@@ -103,7 +115,7 @@ const CreateTrip = () => {
     <div>
       <PageHeader
         title="Plan New Trip"
-        subtitle="Create your multi-city itinerary starting with basic trip dates."
+        subtitle="Create your multi-city itinerary starting with basic trip dates & budget."
         breadcrumbs={[{ label: "My Trips", path: "/my-trips" }, { label: "Plan New Trip" }]}
       />
 
@@ -259,6 +271,39 @@ const CreateTrip = () => {
                 </div>
               </div>
 
+              {/* Budget Limit & Currency Row */}
+              <div className="row g-3 mb-4">
+                <div className="col-md-8">
+                  <label className="form-label text-navy-deep fw-semibold">
+                    Budget Limit <span className="text-muted small">(Optional)</span>
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="1"
+                    name="budget_limit"
+                    className="form-control form-control-lg bg-light border-0 shadow-none"
+                    placeholder="e.g. 100000"
+                    value={formData.budget_limit}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="col-md-4">
+                  <label className="form-label text-navy-deep fw-semibold">Currency</label>
+                  <select
+                    name="currency"
+                    className="form-select form-select-lg bg-light border-0 shadow-none"
+                    value={formData.currency}
+                    onChange={handleChange}
+                  >
+                    <option value="INR">INR (₹)</option>
+                    <option value="USD">USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="GBP">GBP (£)</option>
+                  </select>
+                </div>
+              </div>
+
               {/* Description */}
               <div className="mb-4">
                 <label className="form-label text-navy-deep fw-semibold">
@@ -266,7 +311,7 @@ const CreateTrip = () => {
                 </label>
                 <textarea
                   name="description"
-                  rows="4"
+                  rows="3"
                   className="form-control bg-light border-0 shadow-none"
                   placeholder="Summarize your travel plans, goals, or notes..."
                   value={formData.description}

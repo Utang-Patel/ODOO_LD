@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import PageHeader from "../../components/PageHeader";
 import Loading from "../../components/Loading";
 import tripService from "../../services/tripService";
@@ -22,39 +22,42 @@ const EditTrip = () => {
     description: "",
     start_date: "",
     end_date: "",
-    cover_image: PRESET_COVERS[0].url
+    cover_image: PRESET_COVERS[0].url,
+    budget_limit: "",
+    currency: "INR"
   });
 
   const [initialLoading, setInitialLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
-    const fetchTripDetails = async () => {
+    const fetchTrip = async () => {
       try {
         setInitialLoading(true);
         const res = await tripService.getTrip(id);
-
         if (res.success && res.trip) {
           const t = res.trip;
           setFormData({
-            trip_name: t.trip_name || "",
+            trip_name: t.trip_name || t.name || "",
             description: t.description || "",
             start_date: t.start_date || "",
             end_date: t.end_date || "",
-            cover_image: t.cover_image || PRESET_COVERS[0].url
+            cover_image: t.cover_image || t.coverImage || PRESET_COVERS[0].url,
+            budget_limit: t.budget_limit || "",
+            currency: t.currency || "INR"
           });
         }
       } catch (err) {
-        console.error("[Edit Trip Fetch Error]:", err);
+        console.error("[Fetch Trip Edit Error]:", err);
         setError("Unable to load trip details for editing.");
       } finally {
         setInitialLoading(false);
       }
     };
 
-    fetchTripDetails();
+    fetchTrip();
   }, [id]);
 
   const handleChange = (e) => {
@@ -63,22 +66,12 @@ const EditTrip = () => {
     if (error) setError("");
   };
 
-  const handleSelectPreset = (url) => {
-    setFormData((prev) => ({ ...prev, cover_image: url }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    // Field Validation
     if (!formData.trip_name.trim()) {
       setError("Trip name is required.");
-      return;
-    }
-
-    if (!formData.start_date || !formData.end_date) {
-      setError("Both start date and end date are required.");
       return;
     }
 
@@ -87,30 +80,39 @@ const EditTrip = () => {
       return;
     }
 
-    try {
-      setSubmitting(true);
+    if (formData.budget_limit) {
+      const parsed = parseFloat(formData.budget_limit);
+      if (isNaN(parsed) || parsed <= 0) {
+        setError("Budget limit must be greater than zero.");
+        return;
+      }
+    }
 
+    try {
+      setLoading(true);
       const payload = {
         trip_name: formData.trip_name.trim(),
         description: formData.description.trim(),
         start_date: formData.start_date,
         end_date: formData.end_date,
-        cover_image: formData.cover_image
+        cover_image: formData.cover_image,
+        budget_limit: formData.budget_limit ? parseFloat(formData.budget_limit) : null,
+        currency: formData.currency || "INR"
       };
 
       const res = await tripService.updateTrip(id, payload);
 
-      setSuccessMessage(res.message || "Trip updated successfully!");
+      setSuccessMessage(res.message || "Trip updated successfully! ✈️");
 
       setTimeout(() => {
         navigate("/my-trips");
-      }, 1000);
+      }, 1200);
     } catch (err) {
-      console.error("[Update Trip Error]:", err);
-      const apiMsg = err.response?.data?.message || "Failed to update trip. Please try again.";
+      console.error("[Edit Trip Error]:", err);
+      const apiMsg = err.response?.data?.message || "Failed to update trip.";
       setError(apiMsg);
     } finally {
-      setSubmitting(false);
+      setLoading(false);
     }
   };
 
@@ -121,158 +123,119 @@ const EditTrip = () => {
   return (
     <div>
       <PageHeader
-        title="Edit Trip"
-        subtitle={`Update trip details for "${formData.trip_name || "Your Trip"}"`}
+        title="Edit Trip Details"
+        subtitle="Modify trip parameters, travel dates, or budget limits."
         breadcrumbs={[{ label: "My Trips", path: "/my-trips" }, { label: "Edit Trip" }]}
       />
 
       {error && (
-        <div className="alert alert-danger d-flex align-items-center rounded-3 mb-4 shadow-sm" role="alert">
+        <div className="alert alert-danger d-flex align-items-center rounded-3 mb-4 shadow-sm">
           <i className="bi bi-exclamation-triangle-fill fs-5 me-2"></i>
           <div>{error}</div>
         </div>
       )}
 
       {successMessage && (
-        <div className="alert alert-success d-flex align-items-center rounded-3 mb-4 shadow-sm" role="alert">
+        <div className="alert alert-success d-flex align-items-center rounded-3 mb-4 shadow-sm">
           <i className="bi bi-check-circle-fill fs-5 me-2"></i>
           <div>{successMessage}</div>
         </div>
       )}
 
-      <div className="row g-4">
-        {/* Left Column: Cover Preview & Presets */}
-        <div className="col-lg-5">
-          <div className="gt-card p-4 h-100 d-flex flex-column justify-content-between">
-            <div>
-              <h5 className="font-heading fw-bold text-navy-deep mb-3">Cover Image</h5>
+      <div className="gt-card p-4 p-md-5 max-w-3xl mx-auto">
+        <form onSubmit={handleSubmit}>
+          {/* Trip Name */}
+          <div className="mb-4">
+            <label className="form-label text-navy-deep fw-semibold">Trip Name</label>
+            <input
+              type="text"
+              name="trip_name"
+              className="form-control form-control-lg bg-light border-0 shadow-none"
+              value={formData.trip_name}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-              <div className="position-relative rounded-4 overflow-hidden shadow-sm mb-4" style={{ height: "220px" }}>
-                <img
-                  src={formData.cover_image}
-                  alt="Trip Cover Preview"
-                  className="w-100 h-100"
-                  style={{ objectFit: "cover" }}
-                />
-                <div
-                  className="position-absolute top-0 start-0 w-100 h-100"
-                  style={{ background: "linear-gradient(to bottom, transparent 40%, rgba(7,26,43,0.85))" }}
-                ></div>
-                <div className="position-absolute bottom-0 start-0 m-3 text-white">
-                  <span className="badge bg-ocean-gradient text-white fw-bold mb-1">Active Cover</span>
-                  <h5 className="font-heading fw-bold text-white mb-0">{formData.trip_name || "Trip Name"}</h5>
-                </div>
-              </div>
-
-              <label className="form-label text-navy-deep fw-semibold small mb-2">Change Preset Cover</label>
-              <div className="row g-2">
-                {PRESET_COVERS.map((preset, idx) => (
-                  <div key={idx} className="col-4">
-                    <button
-                      type="button"
-                      onClick={() => handleSelectPreset(preset.url)}
-                      className={`btn p-0 w-100 rounded-3 overflow-hidden border border-2 transition-all ${
-                        formData.cover_image === preset.url ? "border-primary shadow" : "border-transparent opacity-75"
-                      }`}
-                      style={{ height: "60px" }}
-                    >
-                      <img src={preset.url} alt={preset.name} className="w-100 h-100" style={{ objectFit: "cover" }} />
-                    </button>
-                  </div>
-                ))}
-              </div>
+          {/* Dates */}
+          <div className="row g-3 mb-4">
+            <div className="col-md-6">
+              <label className="form-label text-navy-deep fw-semibold">Start Date</label>
+              <input
+                type="date"
+                name="start_date"
+                className="form-control form-control-lg bg-light border-0 shadow-none"
+                value={formData.start_date}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="col-md-6">
+              <label className="form-label text-navy-deep fw-semibold">End Date</label>
+              <input
+                type="date"
+                name="end_date"
+                className="form-control form-control-lg bg-light border-0 shadow-none"
+                value={formData.end_date}
+                onChange={handleChange}
+                required
+              />
             </div>
           </div>
-        </div>
 
-        {/* Right Column: Form */}
-        <div className="col-lg-7">
-          <div className="gt-card p-4 p-md-5">
-            <div className="mb-4">
-              <h3 className="font-heading fw-extrabold text-navy-deep mb-1">Edit Your Trip</h3>
-              <p className="text-muted small">Update your itinerary title, description, or dates.</p>
+          {/* Budget Limit & Currency */}
+          <div className="row g-3 mb-4">
+            <div className="col-md-8">
+              <label className="form-label text-navy-deep fw-semibold">Budget Limit (Optional)</label>
+              <input
+                type="number"
+                step="0.01"
+                min="1"
+                name="budget_limit"
+                className="form-control form-control-lg bg-light border-0 shadow-none"
+                placeholder="e.g. 100000"
+                value={formData.budget_limit}
+                onChange={handleChange}
+              />
             </div>
-
-            <form onSubmit={handleSubmit} noValidate>
-              <div className="mb-4">
-                <label className="form-label text-navy-deep fw-semibold">
-                  Trip Name <span className="text-danger">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="trip_name"
-                  className="form-control form-control-lg bg-light border-0 shadow-none"
-                  value={formData.trip_name}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="row g-3 mb-4">
-                <div className="col-md-6">
-                  <label className="form-label text-navy-deep fw-semibold">
-                    Start Date <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    name="start_date"
-                    className="form-control form-control-lg bg-light border-0 shadow-none"
-                    value={formData.start_date}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div className="col-md-6">
-                  <label className="form-label text-navy-deep fw-semibold">
-                    End Date <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    name="end_date"
-                    className="form-control form-control-lg bg-light border-0 shadow-none"
-                    value={formData.end_date}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <label className="form-label text-navy-deep fw-semibold">Description</label>
-                <textarea
-                  name="description"
-                  rows="4"
-                  className="form-control bg-light border-0 shadow-none"
-                  value={formData.description}
-                  onChange={handleChange}
-                ></textarea>
-              </div>
-
-              <div className="d-flex align-items-center justify-content-end gap-3 pt-3 border-top">
-                <Link to="/my-trips" className="btn btn-gt-outline px-4">
-                  Cancel
-                </Link>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="btn btn-gt-primary px-4 py-2.5 font-heading fw-bold d-flex align-items-center gap-2"
-                >
-                  {submitting ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                      <span>Saving Changes...</span>
-                    </>
-                  ) : (
-                    <>
-                      <i className="bi bi-save me-1"></i>
-                      <span>Save Changes</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
+            <div className="col-md-4">
+              <label className="form-label text-navy-deep fw-semibold">Currency</label>
+              <select
+                name="currency"
+                className="form-select form-select-lg bg-light border-0 shadow-none"
+                value={formData.currency}
+                onChange={handleChange}
+              >
+                <option value="INR">INR (₹)</option>
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="GBP">GBP (£)</option>
+              </select>
+            </div>
           </div>
-        </div>
+
+          {/* Description */}
+          <div className="mb-4">
+            <label className="form-label text-navy-deep fw-semibold">Description</label>
+            <textarea
+              name="description"
+              rows="3"
+              className="form-control bg-light border-0 shadow-none"
+              value={formData.description}
+              onChange={handleChange}
+            ></textarea>
+          </div>
+
+          {/* Actions */}
+          <div className="d-flex align-items-center justify-content-end gap-3 pt-3 border-top">
+            <Link to="/my-trips" className="btn btn-gt-outline px-4">
+              Cancel
+            </Link>
+            <button type="submit" disabled={loading} className="btn btn-gt-primary px-4 py-2.5 font-heading fw-bold">
+              {loading ? "Saving Changes..." : "Save Changes"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

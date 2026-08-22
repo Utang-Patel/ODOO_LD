@@ -5,6 +5,7 @@ import TripCard from "../../components/TripCard";
 import Loading from "../../components/Loading";
 import EmptyState from "../../components/EmptyState";
 import ConfirmModal from "../../components/ConfirmModal";
+import ShareTripModal from "../../components/ShareTripModal";
 import tripService from "../../services/tripService";
 import { getTripStatus } from "../../utils/dateUtils";
 
@@ -18,6 +19,10 @@ const MyTrips = () => {
   // Delete modal state
   const [tripToDelete, setTripToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
+
+  // Share modal state
+  const [tripToShare, setTripToShare] = useState(null);
+
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState("success");
 
@@ -47,6 +52,10 @@ const MyTrips = () => {
     setTripToDelete(trip);
   };
 
+  const handleOpenShareModal = (trip) => {
+    setTripToShare(trip);
+  };
+
   const handleConfirmDelete = async () => {
     if (!tripToDelete) return;
     try {
@@ -64,6 +73,10 @@ const MyTrips = () => {
       setDeleting(false);
       setTimeout(() => setToastMessage(""), 3000);
     }
+  };
+
+  const handleTripUpdated = (updatedTrip) => {
+    setTrips((prev) => prev.map((t) => (t.id === updatedTrip.id ? { ...t, ...updatedTrip } : t)));
   };
 
   // Filter & Search Logic
@@ -157,7 +170,11 @@ const MyTrips = () => {
         <div className="row g-4">
           {filteredTrips.map((trip) => (
             <div key={trip.id} className="col-md-6 col-lg-4">
-              <TripCard trip={trip} onDelete={handleOpenDeleteModal} />
+              <TripCard
+                trip={trip}
+                onDelete={handleOpenDeleteModal}
+                onShare={handleOpenShareModal}
+              />
             </div>
           ))}
         </div>
@@ -182,6 +199,15 @@ const MyTrips = () => {
         onConfirm={handleConfirmDelete}
         onClose={() => setTripToDelete(null)}
       />
+
+      {/* Share Trip Modal */}
+      {tripToShare && (
+        <ShareTripModal
+          trip={tripToShare}
+          onClose={() => setTripToShare(null)}
+          onTripUpdate={handleTripUpdated}
+        />
+      )}
     </div>
   );
 };

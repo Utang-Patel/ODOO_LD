@@ -48,6 +48,8 @@ const Dashboard = () => {
     return acc + calculateTripDays(t.start_date || t.startDate, t.end_date || t.endDate);
   }, 0);
 
+  const firstTripId = realTrips.length > 0 ? realTrips[0].id : null;
+
   // Dynamic greeting based on current local time
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -235,18 +237,24 @@ const Dashboard = () => {
         <div className="d-flex align-items-center justify-content-between mb-3">
           <div>
             <h4 className="font-heading fw-extrabold text-navy-deep mb-1">Trip Budget Highlights</h4>
-            <p className="text-muted small mb-0">Financial allocation summary for {BUDGET_HIGHLIGHTS.activeTripName}.</p>
+            <p className="text-muted small mb-0">Financial allocation summary and budget status.</p>
           </div>
-          <Link to="/budget/trip_1" className="btn btn-gt-outline btn-sm fw-semibold">
-            Full Budget Breakdown <i className="bi bi-arrow-right ms-1"></i>
-          </Link>
+          {firstTripId ? (
+            <Link to={`/budget/${firstTripId}`} className="btn btn-gt-outline btn-sm fw-semibold">
+              Full Budget Breakdown <i className="bi bi-arrow-right ms-1"></i>
+            </Link>
+          ) : (
+            <Link to="/my-trips" className="btn btn-gt-outline btn-sm fw-semibold">
+              My Trips <i className="bi bi-arrow-right ms-1"></i>
+            </Link>
+          )}
         </div>
 
         <div className="gt-card p-4 p-md-5">
           <div className="row align-items-center mb-4">
             <div className="col-md-6 mb-3 mb-md-0">
               <span className="badge bg-light text-ocean-blue border fw-bold px-3 py-1 mb-2">
-                Active Itinerary: {BUDGET_HIGHLIGHTS.activeTripName}
+                Active Itinerary: {realTrips.length > 0 ? realTrips[0].trip_name || realTrips[0].name : BUDGET_HIGHLIGHTS.activeTripName}
               </span>
               <h2 className="font-heading display-6 fw-extrabold text-navy-deep mb-0">
                 ₹{BUDGET_HIGHLIGHTS.totalEstimated.toLocaleString()}
@@ -313,7 +321,7 @@ const Dashboard = () => {
             <StatCard label="Trips Planned" value={totalTripsCount} icon="bi-airplane" badge="Real Data" />
           </div>
           <div className="col-sm-6 col-lg-3">
-            <StatCard label="Destinations" value={8} icon="bi-building" badge="Global" />
+            <StatCard label="Destinations" value={10} icon="bi-building" badge="Global" />
           </div>
           <div className="col-sm-6 col-lg-3">
             <StatCard label="Travel Days" value={totalTravelDays} icon="bi-calendar3" badge="Scheduled" />

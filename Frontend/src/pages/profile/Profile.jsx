@@ -1,142 +1,351 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import PageHeader from "../../components/PageHeader";
+import Loading from "../../components/Loading";
+import DestinationCard from "../../components/DestinationCard";
 import ConfirmModal from "../../components/ConfirmModal";
 import { useAuth } from "../../context/AuthContext";
+import profileService from "../../services/profileService";
+import savedDestinationService from "../../services/savedDestinationService";
+import tripService from "../../services/tripService";
 
 const Profile = () => {
-  const { user, updateUserProfile, logout } = useAuth();
-  const [formData, setFormData] = useState({
-    name: user?.name || "Alex Morgan",
-    email: user?.email || "alex.morgan@globetrotter.io",
-    language: user?.language || "English",
-    currency: user?.currency || "INR (₹)"
-  });
-  const [saved, setSaved] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const navigate = useNavigate();
+  const { logout } = useAuth();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    updateUserProfile(formData);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const [profile, setProfile] = useState(null);
+  const [savedCities, setSavedCities] = useState([]);
+  const [tripCount, setTripCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [toastMessage, setToastMessage] = useState("");
+
+  // Edit Form State
+  const [name, setName] = useState("");
+  const [profileImage, setProfileImage] = useState("");
+  const [language, setLanguage] = useState("en");
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [editError, setEditError] = useState("");
+
+  // Delete Account Modal State
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
+
+  const fetchProfileData = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const profRes = await profileService.getProfile();
+      if (profRes.success && profRes.user) {
+        const u = profRes.user;
+        setProfile(u);
+        setName(u.name || "");
+        setProfileImage(u.profile_image || "");
+        setLanguage(u.language || "en");
+      }
+
+      const savedRes = await savedDestinationService.getSavedDestinations();
+      if (savedRes.success && Array.isArray(savedRes.savedDestinations)) {
+        setSavedCities(savedRes.savedDestinations);
+      }
+
+      const tripsRes = await tripService.getTrips();
+      if (tripsRes.success && Array.isArray(tripsRes.trips)) {
+        setTripCount(tripsRes.trips.length);
+      }
+    } catch (err) {
+      console.error("[Fetch Profile Error]:", err);
+      setError("Unable to load profile data.");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  useEffect(() => {
+    fetchProfileData();
+  }, []);
+
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    setEditError("");
+
+    if (!name.trim()) {
+      setEditError("Full name is required.");
+      return;
+    }
+
+    try {
+      setSavingProfile(true);
+      const res = await profileService.updateProfile({
+        name: name.trim(),
+        profile_image: profileImage ? profileImage.trim() : null,
+        language
+      });
+
+      if (res.success) {
+        setToastMessage("Profile updated successfully! 👤");
+        setProfile((prev) => ({ ...prev, name: res.user.name, profile_image: res.user.profile_image, language: res.user.language }));
+        setTimeout(() => setToastMessage(""), 3000);
+      }
+    } catch (err) {
+      console.error("[Update Profile Error]:", err);
+      const apiMsg = err.response?.data?.message || "Failed to update profile.";
+      setEditError(apiMsg);
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const handleRemoveSaved = async (city) => {
+    try {
+      await savedDestinationService.removeSavedDestination(city.id);
+      setSavedCities((prev) => prev.filter((c) => c.id !== city.id));
+      setToastMessage(`Removed ${city.city_name || city.name} from saved destinations.`);
+      setTimeout(() => setToastMessage(""), 3000);
+    } catch (err) {
+      console.error("[Remove Saved Error]:", err);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      setDeletingAccount(true);
+      await profileService.deleteProfile();
+      logout();
+      navigate("/login");
+    } catch (err) {
+      console.error("[Delete Account Error]:", err);
+      setError("Unable to delete account. Please try again.");
+    } finally {
+      setDeletingAccount(false);
+      setShowDeleteModal(false);
+    }
+  };
+
+  const getInitials = (str) => {
+    if (!str) return "GT";
+    const parts = str.trim().split(" ");
+    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    return str.substring(0, 2).toUpperCase();
+  };
+
+  if (loading) {
+    return <Loading message="Loading your profile..." />;
+  }
+
+  if (error || !profile) {
+    return (
+      <div className="gt-card p-5 text-center my-4">
+        <h5 className="font-heading text-navy-deep fw-bold mb-2">{error || "Profile not found"}</h5>
+        <button onClick={fetchProfileData} className="btn btn-gt-primary px-4">Retry</button>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-4xl mx-auto">
+    <div>
       <PageHeader
         title="My Profile & Settings 👤"
-        subtitle="Manage your personal information, preferences, and saved travel destinations."
+        subtitle="Manage your GlobeTrotter account details, preferences, and saved destinations."
       />
 
-      {saved && (
+      {toastMessage && (
         <div className="alert alert-success d-flex align-items-center gap-2 rounded-3 shadow-sm mb-4">
           <i className="bi bi-check-circle-fill fs-5"></i>
-          <span>Profile changes updated successfully!</span>
+          <span>{toastMessage}</span>
         </div>
       )}
 
-      <div className="gt-card p-4 p-md-5 mb-4">
-        {/* Profile Avatar Header */}
-        <div className="d-flex align-items-center gap-4 pb-4 mb-4 border-bottom">
-          <img
-            src={user?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"}
-            alt={formData.name}
-            className="rounded-circle border border-3 border-primary shadow-sm"
-            style={{ width: "90px", height: "90px", objectFit: "cover" }}
-          />
-          <div>
-            <h4 className="font-heading fw-bold text-navy-deep mb-1">{formData.name}</h4>
-            <p className="text-muted small mb-2">{formData.email}</p>
-            <span className="badge bg-ocean-gradient text-white">Pro GlobeTrotter</span>
-          </div>
-        </div>
+      <div className="row g-4">
+        {/* Left Column: Profile Card Overview */}
+        <div className="col-lg-4">
+          <div className="gt-card p-4 text-center h-100 d-flex flex-column justify-content-between">
+            <div>
+              {/* Profile Avatar / Photo */}
+              <div className="position-relative d-inline-block mb-3">
+                {profile.profile_image ? (
+                  <img
+                    src={profile.profile_image}
+                    alt={profile.name}
+                    className="rounded-circle shadow border border-3 border-white"
+                    style={{ width: "110px", height: "110px", objectFit: "cover" }}
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <div
+                    className="rounded-circle bg-navy-deep text-aqua font-heading fw-extrabold fs-2 d-flex align-items-center justify-content-center mx-auto shadow border border-3 border-white"
+                    style={{ width: "110px", height: "110px" }}
+                  >
+                    {getInitials(profile.name)}
+                  </div>
+                )}
+              </div>
 
-        {/* Profile Form */}
-        <form onSubmit={handleSubmit}>
-          <div className="row g-4">
-            <div className="col-md-6">
-              <label className="form-label text-navy-deep fw-bold">Full Name</label>
-              <input
-                type="text"
-                className="form-control py-2.5 rounded-3"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
-            </div>
+              <h4 className="font-heading fw-extrabold text-navy-deep mb-1">{profile.name}</h4>
+              <p className="text-muted small mb-3">{profile.email}</p>
 
-            <div className="col-md-6">
-              <label className="form-label text-navy-deep fw-bold">Email Address</label>
-              <input
-                type="email"
-                className="form-control py-2.5 rounded-3"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
-            </div>
+              <span className="badge bg-light text-navy-deep border px-3 py-1.5 rounded-pill fw-semibold mb-4">
+                Language: {profile.language === "hi" ? "Hindi (हिंदी)" : profile.language === "gu" ? "Gujarati (ગુજરાતી)" : "English (EN)"}
+              </span>
 
-            <div className="col-md-6">
-              <label className="form-label text-navy-deep fw-bold">Language Preference</label>
-              <select
-                className="form-select py-2.5 rounded-3"
-                value={formData.language}
-                onChange={(e) => setFormData({ ...formData, language: e.target.value })}
-              >
-                <option value="English">English (US)</option>
-                <option value="French">French (Français)</option>
-                <option value="German">German (Deutsch)</option>
-                <option value="Spanish">Spanish (Español)</option>
-              </select>
-            </div>
-
-            <div className="col-md-6">
-              <label className="form-label text-navy-deep fw-bold">Preferred Currency</label>
-              <select
-                className="form-select py-2.5 rounded-3"
-                value={formData.currency}
-                onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-              >
-                <option value="INR (₹)">INR (₹) — Indian Rupee</option>
-                <option value="USD ($)">USD ($) — US Dollar</option>
-                <option value="EUR (€)">EUR (€) — Euro</option>
-              </select>
-            </div>
-
-            <div className="col-12">
-              <label className="form-label text-navy-deep fw-bold mb-2">Saved Destinations</label>
-              <div className="d-flex flex-wrap gap-2">
-                {["Paris 🇫🇷", "Zurich 🇨🇭", "Tokyo 🇯🇵", "Bali 🇮🇩"].map((dest) => (
-                  <span key={dest} className="badge bg-light text-navy-deep border fs-6 px-3 py-2 rounded-pill">
-                    {dest}
-                  </span>
-                ))}
+              {/* Statistics Row */}
+              <div className="row g-2 p-3 bg-light rounded-4 border mb-4">
+                <div className="col-6 border-end">
+                  <span className="text-muted fs-7 d-block">Trips Planned</span>
+                  <span className="fw-extrabold text-navy-deep fs-5">{tripCount}</span>
+                </div>
+                <div className="col-6">
+                  <span className="text-muted fs-7 d-block">Saved Places</span>
+                  <span className="fw-extrabold text-navy-deep fs-5">{savedCities.length}</span>
+                </div>
               </div>
             </div>
 
-            <div className="col-12 d-flex align-items-center justify-content-between pt-4 border-top">
+            {/* Logout Action */}
+            <div className="pt-3 border-top">
               <button
-                type="button"
-                className="btn btn-outline-danger"
-                onClick={() => setShowDeleteModal(true)}
+                onClick={() => {
+                  logout();
+                  navigate("/login");
+                }}
+                className="btn btn-outline-danger w-100 fw-bold"
               >
-                Delete Account
-              </button>
-
-              <button type="submit" className="btn btn-gt-primary px-4 fw-bold">
-                Save Changes
+                <i className="bi bi-box-arrow-right me-2"></i> Log Out
               </button>
             </div>
           </div>
-        </form>
+        </div>
+
+        {/* Right Column: Edit Settings Form */}
+        <div className="col-lg-8">
+          <div className="gt-card p-4 p-md-5 mb-4">
+            <h5 className="font-heading fw-extrabold text-navy-deep mb-4">Personal Information & Preferences</h5>
+
+            {editError && (
+              <div className="alert alert-danger small p-2 mb-3 rounded-3">
+                <i className="bi bi-exclamation-circle me-1"></i> {editError}
+              </div>
+            )}
+
+            <form onSubmit={handleUpdateProfile}>
+              <div className="row g-3 mb-3">
+                <div className="col-md-6">
+                  <label className="form-label text-navy-deep fw-semibold small">Full Name</label>
+                  <input
+                    type="text"
+                    className="form-control bg-light border-0"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label text-navy-deep fw-semibold small">Email Address (Read-only)</label>
+                  <input
+                    type="email"
+                    readOnly
+                    className="form-control bg-light border-0 text-muted"
+                    value={profile.email}
+                  />
+                </div>
+              </div>
+
+              <div className="row g-3 mb-4">
+                <div className="col-md-6">
+                  <label className="form-label text-navy-deep fw-semibold small">Profile Image URL (Optional)</label>
+                  <input
+                    type="url"
+                    className="form-control bg-light border-0"
+                    placeholder="https://example.com/avatar.jpg"
+                    value={profileImage}
+                    onChange={(e) => setProfileImage(e.target.value)}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label text-navy-deep fw-semibold small">Language Preference</label>
+                  <select
+                    className="form-select bg-light border-0"
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value)}
+                  >
+                    <option value="en">English (EN)</option>
+                    <option value="hi">Hindi (हिंदी)</option>
+                    <option value="gu">Gujarati (ગુજરાતી)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="d-flex justify-content-end">
+                <button type="submit" disabled={savingProfile} className="btn btn-gt-primary px-4 fw-bold">
+                  {savingProfile ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Danger Zone: Delete Account */}
+          <div className="gt-card p-4 border border-danger border-opacity-25 bg-danger bg-opacity-10">
+            <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
+              <div>
+                <h6 className="font-heading fw-bold text-danger mb-1">Danger Zone — Delete Account</h6>
+                <p className="text-muted small mb-0">Permanently delete your account and all associated trips and data.</p>
+              </div>
+              <button onClick={() => setShowDeleteModal(true)} className="btn btn-danger btn-sm px-3 fw-bold">
+                Delete Account
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
+      {/* Saved Destinations Section */}
+      <div className="mt-5">
+        <div className="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 className="font-heading fw-extrabold text-navy-deep mb-1">Saved Destinations ❤️</h4>
+            <p className="text-muted small mb-0">Your favorite travel places saved for future itineraries.</p>
+          </div>
+          <Link to="/cities" className="btn btn-gt-outline btn-sm fw-semibold">
+            Explore Cities <i className="bi bi-arrow-right ms-1"></i>
+          </Link>
+        </div>
+
+        {savedCities.length > 0 ? (
+          <div className="row g-4">
+            {savedCities.map((city) => (
+              <div key={city.id} className="col-md-6 col-lg-4">
+                <DestinationCard
+                  city={city}
+                  isSaved={true}
+                  onToggleSave={handleRemoveSaved}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="gt-card p-5 text-center">
+            <p className="text-muted mb-3">Save places you want to visit ❤️</p>
+            <Link to="/cities" className="btn btn-gt-primary px-4">
+              Explore Destinations
+            </Link>
+          </div>
+        )}
+      </div>
+
+      {/* Delete Account Confirmation Modal */}
       <ConfirmModal
-        show={showDeleteModal}
-        title="Delete Account?"
-        message="Are you sure you want to permanently delete your GlobeTrotter account and all associated itineraries?"
-        confirmText="Delete Permanently"
-        isDanger={true}
-        onConfirm={logout}
-        onCancel={() => setShowDeleteModal(false)}
+        isOpen={showDeleteModal}
+        title="Delete your account permanently?"
+        message="Are you sure you want to delete your account? This will permanently remove your account and all your trips, itineraries, expenses, and saved destinations. This action cannot be undone."
+        confirmText="Yes, Delete My Account"
+        cancelText="Cancel"
+        confirmVariant="danger"
+        isLoading={deletingAccount}
+        onConfirm={handleDeleteAccount}
+        onClose={() => setShowDeleteModal(false)}
       />
     </div>
   );
