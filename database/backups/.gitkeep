@@ -1,0 +1,2 @@
+# Local Database Backups Directory
+# Real SQL database dumps (*.sql) in this folder are ignored by .gitignore to prevent committing secrets.
